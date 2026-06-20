@@ -1,0 +1,57 @@
+@model RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+    ViewData["PageTitle"] = "Create account";
+}
+
+<section class="auth-layout">
+    <form class="auth-card wide" asp-action="Register" method="post">
+        <div class="form-heading">
+            <span class="badge"><i data-lucide="user-plus"></i> Join platform</span>
+            <h2>Student or instructor profile</h2>
+        </div>
+        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+        <div class="form-grid">
+            <div>
+                <label asp-for="FullName"></label>
+                <input asp-for="FullName" placeholder="Full name" />
+                <span asp-validation-for="FullName"></span>
+            </div>
+            <div>
+                <label asp-for="Email"></label>
+                <input asp-for="Email" placeholder="name@depi.edu" />
+                <span asp-validation-for="Email"></span>
+            </div>
+            <div>
+                <label asp-for="Password"></label>
+                <input asp-for="Password" placeholder="At least 8 characters" />
+                <span asp-validation-for="Password"></span>
+            </div>
+            <div>
+                <label asp-for="ConfirmPassword"></label>
+                <input asp-for="ConfirmPassword" placeholder="Repeat password" />
+                <span asp-validation-for="ConfirmPassword"></span>
+            </div>
+            <div>
+                <label asp-for="Role"></label>
+                <select asp-for="Role">
+                    <option value="@AppRoles.Student">Student</option>
+                    <option value="@AppRoles.Instructor">Instructor</option>
+                </select>
+                <span asp-validation-for="Role"></span>
+            </div>
+            <div>
+                <label asp-for="ProgramOrDepartment">Program / Department</label>
+                <input asp-for="ProgramOrDepartment" placeholder="Full Stack .NET" />
+                <span asp-validation-for="ProgramOrDepartment"></span>
+            </div>
+        </div>
+
+        <button class="button" type="submit"><i data-lucide="arrow-right"></i>Create account</button>
+    </form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

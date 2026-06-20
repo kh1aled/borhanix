@@ -1,0 +1,46 @@
+@model IReadOnlyCollection<CourseCardViewModel>
+@{
+    ViewData["Title"] = "Courses";
+    ViewData["PageTitle"] = "Course catalog";
+}
+
+<section class="section-heading with-actions">
+    <div>
+        <span class="badge"><i data-lucide="layers-3"></i> Full LMS</span>
+        <h2>Courses</h2>
+    </div>
+    @if (User.IsInRole(AppRoles.Instructor) || User.IsInRole(AppRoles.Admin))
+    {
+        <a class="button" asp-controller="InstructorStudio" asp-action="CreateCourse"><i data-lucide="plus"></i>New course</a>
+    }
+</section>
+
+<section class="course-grid">
+    @foreach (var course in Model)
+    {
+        <article class="course-card large" style="--accent:@course.AccentColor">
+            @if (!string.IsNullOrWhiteSpace(course.HeroImageUrl))
+            {
+                <img src="@course.HeroImageUrl" alt="" />
+            }
+            <div>
+                <span>@course.Code</span>
+                <h3>@course.Title</h3>
+                <p>@course.Summary</p>
+                <div class="course-meta">
+                    <span>@course.Category</span>
+                    <span>@course.Level</span>
+                    <span>@course.ModuleCount modules</span>
+                    <span>@course.EnrollmentCount students</span>
+                </div>
+                <div class="button-row">
+                    <a class="button button-small" asp-action="Details" asp-route-id="@course.Id">Open</a>
+                    @if (course.EnrollmentStatus is not null)
+                    {
+                        <span class="status-pill">@course.EnrollmentStatus</span>
+                    }
+                </div>
+            </div>
+        </article>
+    }
+</section>

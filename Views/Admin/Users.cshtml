@@ -1,0 +1,89 @@
+@model AdminUsersViewModel
+@{
+    ViewData["Title"] = "Users";
+    ViewData["PageTitle"] = "User control";
+}
+
+<section class="section-heading with-actions">
+    <div>
+        <span class="badge"><i data-lucide="shield-check"></i> Admin only</span>
+        <h2>Approve, edit, role, delete</h2>
+    </div>
+    <a class="button button-ghost" asp-controller="Admin" asp-action="Index">Back</a>
+</section>
+
+<div class="admin-user-list">
+    @foreach (var user in Model.Users)
+    {
+        <article class="admin-user-row">
+            <form asp-action="UpdateUser" method="post" class="admin-user-form">
+                <input type="hidden" name="Id" value="@user.Id" />
+                <div>
+                    <label>Name</label>
+                    <input name="FullName" value="@user.FullName" />
+                </div>
+                <div>
+                    <label>Email</label>
+                    <input name="Email" value="@user.Email" />
+                </div>
+                <div>
+                    <label>Role</label>
+                    <select name="Role">
+                        @if (user.Roles.Contains(AppRoles.Student))
+                        {
+                            <option value="@AppRoles.Student" selected>Student</option>
+                        }
+                        else
+                        {
+                            <option value="@AppRoles.Student">Student</option>
+                        }
+                        @if (user.Roles.Contains(AppRoles.Instructor))
+                        {
+                            <option value="@AppRoles.Instructor" selected>Instructor</option>
+                        }
+                        else
+                        {
+                            <option value="@AppRoles.Instructor">Instructor</option>
+                        }
+                        @if (user.Roles.Contains(AppRoles.Admin))
+                        {
+                            <option value="@AppRoles.Admin" selected>Admin</option>
+                        }
+                        else
+                        {
+                            <option value="@AppRoles.Admin">Admin</option>
+                        }
+                    </select>
+                </div>
+                <label class="check-line">
+                    @if (user.IsApproved)
+                    {
+                        <input name="IsApproved" type="checkbox" value="true" checked />
+                    }
+                    else
+                    {
+                        <input name="IsApproved" type="checkbox" value="true" />
+                    }
+                    <input name="IsApproved" type="hidden" value="false" />
+                    <span>Approved</span>
+                </label>
+                <button class="button button-small" type="submit"><i data-lucide="save"></i>Save</button>
+            </form>
+            <div class="admin-user-actions">
+                <span class="status-pill">@(user.IsApproved ? "Approved" : "Pending")</span>
+                <small>@user.Roles</small>
+                @if (!user.IsApproved)
+                {
+                    <form asp-action="ApproveUser" method="post">
+                        <input type="hidden" name="id" value="@user.Id" />
+                        <button class="button button-small" type="submit">Approve</button>
+                    </form>
+                }
+                <form asp-action="DeleteUser" method="post" onsubmit="return confirm('Delete this user?');">
+                    <input type="hidden" name="id" value="@user.Id" />
+                    <button class="button button-small button-danger" type="submit"><i data-lucide="trash-2"></i>Delete</button>
+                </form>
+            </div>
+        </article>
+    }
+</div>

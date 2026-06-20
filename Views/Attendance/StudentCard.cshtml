@@ -1,0 +1,38 @@
+@model StudentCardViewModel
+@{
+    ViewData["Title"] = "Student ID";
+    ViewData["PageTitle"] = "Student QR ID";
+}
+
+<section class="student-card-wrap">
+    <article class="student-card">
+        <header>
+            <span class="brand-mark">D</span>
+            <div>
+                <strong>DEPI LMS</strong>
+                <small>Student Identity Card</small>
+            </div>
+        </header>
+
+        <div class="student-card-body">
+            <div class="student-photo" style="--avatar:@Model.User.AvatarColor">
+                @Model.User.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(x => x[0]).Take(2).Aggregate("", (a, b) => a + b)
+            </div>
+            <div>
+                <span>@Model.Profile.StudentCode</span>
+                <h2>@Model.User.FullName</h2>
+                <p>@Model.Profile.Program</p>
+                <p>@Model.Profile.Level</p>
+            </div>
+        </div>
+
+        <div class="qr-box">
+            <img class="student-qr" src="@Model.QrImageDataUri" alt="Student QR code for @Model.Profile.StudentCode" width="320" height="320" />
+        </div>
+
+        <footer>
+            <span>@Model.ApprovedCourses approved courses</span>
+            <span>@Model.AttendanceRate% attendance</span>
+        </footer>
+    </article>
+</section>

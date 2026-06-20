@@ -1,0 +1,42 @@
+@model IReadOnlyCollection<Enrollment>
+@{
+    ViewData["Title"] = "Approvals";
+    ViewData["PageTitle"] = "Enrollment approvals";
+}
+
+<section class="section-heading">
+    <div>
+        <span class="badge"><i data-lucide="user-check"></i> Approval queue</span>
+        <h2>Pending enrollments</h2>
+    </div>
+</section>
+
+@if (Model.Count == 0)
+{
+    <section class="empty-state">
+        <i data-lucide="inbox"></i>
+        <h2>No pending requests</h2>
+        <p>Enrollment requests will appear here when students join a course.</p>
+    </section>
+}
+else
+{
+    <div class="approval-list">
+        @foreach (var item in Model)
+        {
+            <article class="approval-item">
+                <div>
+                    <span>@item.Course.Code</span>
+                    <h3>@item.Student.FullName</h3>
+                    <p>@item.Student.Email requested @item.Course.Title on @item.RequestedAt.ToLocalTime().ToString("MMM d, h:mm tt").</p>
+                </div>
+                <form asp-action="Decide" method="post" class="approval-actions">
+                    <input type="hidden" name="id" value="@item.Id" />
+                    <input name="note" placeholder="Optional note" />
+                    <button class="button button-small" name="status" value="@EnrollmentStatus.Approved" type="submit">Approve</button>
+                    <button class="button button-small button-danger" name="status" value="@EnrollmentStatus.Rejected" type="submit">Reject</button>
+                </form>
+            </article>
+        }
+    </div>
+}

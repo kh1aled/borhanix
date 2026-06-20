@@ -1,0 +1,47 @@
+@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin";
+    ViewData["PageTitle"] = "Admin control";
+}
+
+<section class="stats-grid">
+    <article class="stat-card tone-cyan"><i data-lucide="users"></i><span>Users</span><strong>@Model.UserCount</strong><small>Identity accounts</small></article>
+    <article class="stat-card tone-green"><i data-lucide="book-open"></i><span>Courses</span><strong>@Model.CourseCount</strong><small>LMS catalog</small></article>
+    <article class="stat-card tone-amber"><i data-lucide="badge-alert"></i><span>Pending</span><strong>@Model.PendingEnrollments</strong><small>Enrollment approvals</small></article>
+    <article class="stat-card tone-violet"><i data-lucide="qr-code"></i><span>Sessions</span><strong>@Model.AttendanceSessions</strong><small>Attendance events</small></article>
+</section>
+
+<section class="section-heading">
+    <div>
+        <span class="badge"><i data-lucide="users-round"></i> Recent accounts</span>
+        <h2>Users</h2>
+    </div>
+    <div class="button-row">
+        <a class="button button-ghost" asp-action="Users"><i data-lucide="users"></i>Manage users</a>
+        <a class="button" asp-controller="InstructorStudio" asp-action="Index"><i data-lucide="book-open-check"></i>Manage courses</a>
+    </div>
+</section>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Created</th>
+                <th>Last active</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model.RecentUsers)
+            {
+                <tr>
+                    <td>@user.FullName</td>
+                    <td>@user.Email</td>
+                    <td>@user.CreatedAt.ToLocalTime().ToString("MMM d, yyyy")</td>
+                    <td>@(user.LastActiveAt?.ToLocalTime().ToString("MMM d, h:mm tt") ?? "-")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

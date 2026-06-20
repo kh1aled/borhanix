@@ -1,0 +1,73 @@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+    ViewData["PageTitle"] = $"{Model.Role} dashboard";
+}
+
+<section class="welcome-band">
+    <div>
+        <span class="badge"><i data-lucide="badge-check"></i>@Model.Role</span>
+        <h2>@Model.UserName</h2>
+    </div>
+    <div class="button-row">
+        <a class="button button-ghost" asp-controller="Courses" asp-action="Index"><i data-lucide="book-open"></i>Courses</a>
+        <a class="button" asp-controller="AiAssistant" asp-action="Index"><i data-lucide="sparkles"></i>Ask AI</a>
+    </div>
+</section>
+
+<section class="stats-grid">
+    @foreach (var stat in Model.Stats)
+    {
+        <article class="stat-card tone-@stat.Tone">
+            <i data-lucide="@stat.Icon"></i>
+            <span>@stat.Label</span>
+            <strong>@stat.Value</strong>
+            <small>@stat.Hint</small>
+        </article>
+    }
+</section>
+
+<section class="content-grid">
+    <div>
+        <div class="section-heading">
+            <h2>Courses</h2>
+            <a asp-controller="Courses" asp-action="Index">View all</a>
+        </div>
+        <div class="course-grid compact">
+            @foreach (var course in Model.Courses.Take(6))
+            {
+                <a class="course-card" asp-controller="Courses" asp-action="Details" asp-route-id="@course.Id" style="--accent:@course.AccentColor">
+                    <span>@course.Code</span>
+                    <h3>@course.Title</h3>
+                    <p>@course.Summary</p>
+                    <div class="course-meta">
+                        <span>@course.ModuleCount modules</span>
+                        <span>@course.LessonCount lessons</span>
+                    </div>
+                </a>
+            }
+        </div>
+    </div>
+
+    <aside class="activity-panel">
+        <div class="section-heading">
+            <h2>Activity</h2>
+        </div>
+        @if (Model.Activity.Count == 0)
+        {
+            <p class="muted">No activity yet.</p>
+        }
+        else
+        {
+            @foreach (var item in Model.Activity)
+            {
+                <div class="activity-item">
+                    <span>@item.Type</span>
+                    <strong>@item.Title</strong>
+                    <small>@item.Detail</small>
+                    <time>@item.At.ToLocalTime().ToString("MMM d, h:mm tt")</time>
+                </div>
+            }
+        }
+    </aside>
+</section>

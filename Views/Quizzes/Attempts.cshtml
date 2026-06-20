@@ -1,0 +1,36 @@
+@model QuizAttemptsViewModel
+@{
+    ViewData["Title"] = "Quiz attempts";
+    ViewData["PageTitle"] = "Quiz attempts";
+}
+
+<section class="section-heading">
+    <div>
+        <span class="badge"><i data-lucide="list-checks"></i>@Model.Quiz.Course.Code</span>
+        <h2>@Model.Quiz.Title</h2>
+    </div>
+</section>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Score</th>
+                <th>Submitted</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var attempt in Model.Attempts)
+            {
+                <tr>
+                    <td>@attempt.Student.FullName</td>
+                    <td>@attempt.Score</td>
+                    <td>@attempt.SubmittedAt?.ToLocalTime().ToString("MMM d, h:mm tt")</td>
+                    <td><a asp-action="Result" asp-route-id="@attempt.Id">Open</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

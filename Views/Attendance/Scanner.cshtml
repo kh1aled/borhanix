@@ -1,0 +1,48 @@
+@model AttendanceScanViewModel
+@{
+    ViewData["Title"] = "Scanner";
+    ViewData["PageTitle"] = "Student QR scanner";
+}
+
+<section class="scanner-layout">
+    <div class="scanner-panel">
+        <div class="section-heading">
+            <div>
+                <span class="badge"><i data-lucide="scan-qr-code"></i> QR attendance</span>
+                <h2>@(Model.Session?.Title ?? "Choose session")</h2>
+            </div>
+        </div>
+        <div id="reader" class="reader-box"></div>
+    </div>
+
+    <aside class="activity-panel">
+        <form method="get" asp-action="Scanner">
+            <label>Session</label>
+            <select name="sessionId" onchange="this.form.submit()">
+                @foreach (var session in Model.AvailableSessions)
+                {
+                    if (session.Id == Model.SessionId)
+                    {
+                        <option value="@session.Id" selected>@session.Course.Code - @session.Title</option>
+                    }
+                    else
+                    {
+                        <option value="@session.Id">@session.Course.Code - @session.Title</option>
+                    }
+                }
+            </select>
+        </form>
+
+        <form asp-action="Mark" method="post" id="scanForm">
+            <input type="hidden" asp-for="SessionId" />
+            <label asp-for="Payload">Student QR payload</label>
+            <textarea asp-for="Payload" id="Payload" rows="6" placeholder="Scan or paste the student's QR payload"></textarea>
+            <button class="button" type="submit"><i data-lucide="check"></i>Mark attendance</button>
+        </form>
+    </aside>
+</section>
+
+@section Scripts {
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="~/js/attendance-scanner.js" asp-append-version="true"></script>
+}

@@ -1,0 +1,12 @@
+@model QuizResultViewModel
+@{
+    ViewData["Title"] = "Quiz result";
+    ViewData["PageTitle"] = "Quiz result";
+}
+
+<section class="empty-state">
+    <i data-lucide="badge-check"></i>
+    <h2>@Model.Attempt.Quiz.Title</h2>
+    <p>Score: @Model.Attempt.Score / @Model.MaxScore</p>
+    <a class="button" asp-controller="Courses" asp-action="Details" asp-route-id="@Model.Attempt.Quiz.CourseId">Back to course</a>
+</section>

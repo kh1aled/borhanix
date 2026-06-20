@@ -1,0 +1,94 @@
+@model AttendanceIndexViewModel
+@{
+    ViewData["Title"] = "Attendance";
+    ViewData["PageTitle"] = "QR attendance";
+}
+
+@if (User.IsInRole(AppRoles.Student))
+{
+    <section class="section-heading with-actions">
+        <div>
+            <span class="badge"><i data-lucide="id-card"></i> Student attendance</span>
+            <h2>Your records</h2>
+        </div>
+        <a class="button" asp-action="StudentCard"><i data-lucide="qr-code"></i>My ID card</a>
+    </section>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Course</th>
+                    <th>Session</th>
+                    <th>Status</th>
+                    <th>Captured</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var record in Model.Records)
+                {
+                    <tr>
+                        <td>@record.AttendanceSession.Course.Code</td>
+                        <td>@record.AttendanceSession.Title</td>
+                        <td><span class="status-pill">@record.Status</span></td>
+                        <td>@record.CapturedAt.ToLocalTime().ToString("MMM d, h:mm tt")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <section class="section-heading with-actions">
+        <div>
+            <span class="badge"><i data-lucide="scan-line"></i> Instructor attendance</span>
+            <h2>Sessions</h2>
+        </div>
+        <a class="button" asp-action="Scanner"><i data-lucide="scan-qr-code"></i>Open scanner</a>
+    </section>
+
+    <form class="editor-panel compact" asp-action="CreateSession" method="post">
+        <h3>Create attendance session</h3>
+        <div class="form-grid four">
+            <div>
+                <label asp-for="NewSession.CourseId">Course</label>
+                <select asp-for="NewSession.CourseId" name="CourseId">
+                    @foreach (var course in Model.Courses)
+                    {
+                        <option value="@course.Id">@course.Code - @course.Title</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label asp-for="NewSession.Title">Title</label>
+                <input asp-for="NewSession.Title" name="Title" placeholder="Lecture attendance" />
+            </div>
+            <div>
+                <label asp-for="NewSession.OpensAt">Opens</label>
+                <input asp-for="NewSession.OpensAt" name="OpensAt" type="datetime-local" />
+            </div>
+            <div>
+                <label asp-for="NewSession.ClosesAt">Closes</label>
+                <input asp-for="NewSession.ClosesAt" name="ClosesAt" type="datetime-local" />
+            </div>
+        </div>
+        <button class="button button-small" type="submit"><i data-lucide="calendar-plus"></i>Create</button>
+    </form>
+
+    <div class="session-grid">
+        @foreach (var session in Model.Sessions)
+        {
+            <article class="session-card">
+                <span>@session.Course.Code</span>
+                <h3>@session.Title</h3>
+                <p>@session.SessionDate.ToLocalTime().ToString("MMM d, yyyy")</p>
+                <div class="course-meta">
+                    <span>@session.Records.Count scans</span>
+                    <span>@session.SessionCode</span>
+                </div>
+                <a class="button button-small button-ghost" asp-action="Scanner" asp-route-sessionId="@session.Id">Scan students</a>
+            </article>
+        }
+    </div>
+}

@@ -1,0 +1,48 @@
+@model CourseEditViewModel
+
+<div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+<div class="form-grid">
+    <div>
+        <label asp-for="Code"></label>
+        <input asp-for="Code" placeholder="DOTNET-101" />
+        <span asp-validation-for="Code"></span>
+    </div>
+    <div>
+        <label asp-for="Title"></label>
+        <input asp-for="Title" placeholder="Course title" />
+        <span asp-validation-for="Title"></span>
+    </div>
+    <div>
+        <label asp-for="Category"></label>
+        <input asp-for="Category" />
+        <span asp-validation-for="Category"></span>
+    </div>
+    <div>
+        <label asp-for="Level"></label>
+        <input asp-for="Level" />
+        <span asp-validation-for="Level"></span>
+    </div>
+    <div>
+        <label asp-for="AccentColor"></label>
+        <input asp-for="AccentColor" type="color" />
+        <span asp-validation-for="AccentColor"></span>
+    </div>
+    <div>
+        <label asp-for="HeroImageUrl"></label>
+        <input asp-for="HeroImageUrl" placeholder="https://..." />
+        <span asp-validation-for="HeroImageUrl"></span>
+    </div>
+</div>
+
+<label asp-for="Summary"></label>
+<input asp-for="Summary" placeholder="Short catalog summary" />
+<span asp-validation-for="Summary"></span>
+
+<label asp-for="Description"></label>
+<textarea asp-for="Description" rows="8" placeholder="Detailed course description"></textarea>
+<span asp-validation-for="Description"></span>
+
+<label class="check-line">
+    <input asp-for="IsPublished" />
+    <span>Published</span>
+</label>

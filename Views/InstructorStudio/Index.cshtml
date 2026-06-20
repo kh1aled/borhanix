@@ -1,0 +1,88 @@
+@model IReadOnlyCollection<Course>
+@{
+    ViewData["Title"] = "Instructor Studio";
+    ViewData["PageTitle"] = "Instructor studio";
+}
+
+<section class="section-heading with-actions">
+    <div>
+        <span class="badge"><i data-lucide="presentation"></i> Build LMS content</span>
+        <h2>Courses, modules, lessons, assignments</h2>
+    </div>
+    <a class="button" asp-action="CreateCourse"><i data-lucide="plus"></i>New course</a>
+</section>
+
+<section class="studio-list">
+    @foreach (var course in Model)
+    {
+        <article class="studio-course" style="--accent:@course.AccentColor">
+            <header>
+                <div>
+                    <span>@course.Code</span>
+                    <h3>@course.Title</h3>
+                    <p>@course.Summary</p>
+                </div>
+                <div class="button-row">
+                    <a class="button button-ghost button-small" asp-controller="Courses" asp-action="Details" asp-route-id="@course.Id">Preview</a>
+                    <a class="button button-ghost button-small" asp-action="EditCourse" asp-route-id="@course.Id"><i data-lucide="pencil"></i>Edit</a>
+                    <form asp-action="DeleteCourse" method="post" onsubmit="return confirm('Delete this course?');">
+                        <input type="hidden" name="id" value="@course.Id" />
+                        <button class="button button-small button-danger" type="submit"><i data-lucide="trash-2"></i>Delete</button>
+                    </form>
+                </div>
+            </header>
+
+            <div class="studio-forms">
+                <form asp-action="AddModule" method="post">
+                    <input type="hidden" name="CourseId" value="@course.Id" />
+                    <label>Module</label>
+                    <input name="Title" placeholder="Module title" />
+                    <input name="Summary" placeholder="Short summary" />
+                    <button class="button button-small" type="submit"><i data-lucide="plus"></i>Add module</button>
+                </form>
+
+                <form asp-action="AddAssignment" method="post">
+                    <input type="hidden" name="CourseId" value="@course.Id" />
+                    <label>Assignment</label>
+                    <input name="Title" placeholder="Assignment title" />
+                    <textarea name="Brief" placeholder="Brief"></textarea>
+                    <input name="MaxPoints" type="number" value="100" />
+                    <button class="button button-small" type="submit"><i data-lucide="clipboard-plus"></i>Add assignment</button>
+                </form>
+            </div>
+
+            <div class="module-strip">
+                @foreach (var module in course.Modules.OrderBy(x => x.SortOrder))
+                {
+                    <details>
+                        <summary>@module.Title <span>@module.Lessons.Count lessons</span></summary>
+                        <form asp-action="AddLesson" method="post" class="inline-form" enctype="multipart/form-data">
+                            <input type="hidden" name="ModuleId" value="@module.Id" />
+                            <input name="Title" placeholder="Lesson title" />
+                            <input name="DurationMinutes" type="number" value="30" />
+                            <input name="VideoUrl" placeholder="Video URL or upload below" />
+                            <input name="ResourceUrl" placeholder="Resource URL" />
+                            <input name="VideoFile" type="file" accept=".mp4,.webm,.mov" />
+                            <textarea name="Content" placeholder="Lesson content"></textarea>
+                            <button class="button button-small" type="submit">Add lesson</button>
+                        </form>
+                        @foreach (var lesson in module.Lessons.OrderBy(x => x.SortOrder))
+                        {
+                            <div class="lesson-manage-row">
+                                <span>@lesson.Title</span>
+                                @if (!string.IsNullOrWhiteSpace(lesson.VideoUrl))
+                                {
+                                    <a href="@lesson.VideoUrl" target="_blank">Video</a>
+                                }
+                                <form asp-action="GenerateQuizFromLesson" method="post">
+                                    <input type="hidden" name="lessonId" value="@lesson.Id" />
+                                    <button class="button button-small button-ghost" type="submit"><i data-lucide="sparkles"></i>AI quiz</button>
+                                </form>
+                            </div>
+                        }
+                    </details>
+                }
+            </div>
+        </article>
+    }
+</section>
