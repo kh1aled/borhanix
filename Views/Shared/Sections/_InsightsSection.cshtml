@@ -1,0 +1,50 @@
+﻿<section class="bg-white border-t border-[#e8edf7]">
+    <div class="container mx-auto px-[60px] pt-20 pb-20">
+
+        <div class="flex flex-col items-center text-center mb-14">
+            <h2 class="text-4xl font-bold text-[#052c65] mb-3">Insights &amp; Updates</h2>
+            <p class="text-[#6c757d] text-base">Stay Informed with the Latest News, Tips, and Trends in Online Learning</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            @{
+                var posts = new[]
+                {
+                    new { Badge = "Tutorial", Title = "Top 10 Online Courses To Boost Your Career In 2025", Img = "blog-1.jpg", Author = "Lisa Menon", Avatar = "avatar-1.jpg", Date = "Jan 12 2025", ReadTime = "02 Min Read" },
+                    new { Badge = "Tutorial", Title = "How To Stay Motivated While Learning From Home", Img = "blog-2.jpg", Author = "Jason Reed", Avatar = "avatar-4.jpg", Date = "Apr 22 2025", ReadTime = "08 Min Read" },
+                    new { Badge = "Tutorial", Title = "The Best Platforms For Learning Programming Online", Img = "blog-3.jpg", Author = "Matt Cooper", Avatar = "avatar-3.jpg", Date = "Mar 17 2025", ReadTime = "04 Min Read" },
+                };
+                var excerpt = "Our mission is to develop the most advanced Bootstrap-based UI Kit for...";
+            }
+            @foreach (var post in posts)
+            {
+                <div class="bg-white rounded-2xl border border-[#e8edf7] shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col">
+                    <a href="#" class="block">
+                        <img class="w-full h-auto object-cover" src="~/images/blogs/@post.Img" alt="@post.Title" />
+                    </a>
+
+                    <div class="px-6 pt-5 pb-6 flex flex-col flex-1">
+                        <span class="inline-block self-start bg-[#e7f6ec] text-[#3cb878] text-sm font-medium rounded-full px-3 py-1 mb-3">@post.Badge</span>
+
+                        <h3 class="text-xl font-bold text-[#052c65] leading-snug mb-3">
+                            <a href="#" class="hover:text-[#0b5ed7] transition-colors">@post.Title</a>
+                        </h3>
+
+                        <p class="text-[#6c757d] text-base leading-relaxed mb-6">@excerpt</p>
+
+                        <div class="mt-auto flex items-center justify-between">
+                            <a href="#" class="flex items-center gap-3">
+                                <img class="rounded-full object-cover w-10 h-10" src="~/images/instructors/@post.Avatar" alt="@post.Author" />
+                                <span class="flex flex-col leading-tight">
+                                    <span class="font-bold text-[#052c65] text-base">@post.Author</span>
+                                    <span class="text-[#6c757d] text-sm">@post.Date</span>
+                                </span>
+                            </a>
+                            <span class="text-[#6c757d] text-sm whitespace-nowrap">@post.ReadTime</span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>

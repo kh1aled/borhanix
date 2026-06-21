@@ -1,0 +1,25 @@
+﻿<section class="relative bg-[#0068D9] bg-[url('/images/shared/subscribe-bg.png')] bg-cover bg-no-repeat overflow-hidden">
+    <div class="absolute -left-10 top-14 w-64 h-12 bg-white/10 rounded-full"></div>
+    <div class="absolute -left-10 top-32 w-52 h-12 bg-white/10 rounded-full"></div>
+    <div class="absolute -left-10 top-[180px] w-36 h-12 bg-white/10 rounded-full"></div>
+
+    <div class="absolute left-[140px] bottom-0 w-5 h-16 bg-white/10 rounded-t-full"></div>
+    <div class="absolute left-[185px] bottom-0 w-5 h-10 bg-white/10 rounded-t-full"></div>
+
+    <div class="container relative mx-auto px-[60px] pt-20 pb-20">
+        <div class="flex flex-col items-center text-center mb-10">
+            <h2 class="text-4xl font-bold text-white mb-3">Join Thousand Of Happy Students!</h2>
+            <p class="text-white opacity-75 text-base">Subscribe our newsletter &amp; get latest news and updation!</p>
+        </div>
+
+        <form asp-controller="Newsletter" asp-action="Subscribe" method="post" class="max-w-3xl mx-auto">
+            <div class="flex items-center bg-white rounded-full p-2 pl-8">
+                <input type="email" name="email" required placeholder="Your Email Address"
+                       class="flex-1 bg-transparent border-none outline-none text-[#6c757d] placeholder-[#6c757d] text-base" />
+                <button type="submit" class="bg-[#0a2540] text-white font-semibold rounded-full px-8 py-3 whitespace-nowrap hover:bg-[#0e3358] transition-colors">
+                    Get Started
+                </button>
+            </div>
+        </form>
+    </div>
+</section>

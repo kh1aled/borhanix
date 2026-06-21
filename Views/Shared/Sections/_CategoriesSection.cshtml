@@ -1,0 +1,35 @@
+﻿<section class="section bg-white">
+    <div class="container mx-auto px-[60px] py-20">
+
+        <div class="flex flex-col items-center text-center mb-12">
+            <h2 class="text-3xl font-bold text-[#052c65] mb-3">Discover Categories</h2>
+            <p class="text-muted text-base">Browse a Wide Range of Subjects to Start Learning What You Love</p>
+        </div>
+
+        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            @{
+                var categories = new[]
+                {
+                    new { Title = "Web Development", Count = 12, Icon = "code-2" },
+                    new { Title = "UI/UX Design", Count = 45, Icon = "pen-tool" },
+                    new { Title = "Mobile Development", Count = 23, Icon = "smartphone" },
+                    new { Title = "Digital Marketing", Count = 56, Icon = "megaphone" },
+                    new { Title = "Entrepreneurship", Count = 87, Icon = "briefcase" },
+                    new { Title = "Personal Finance", Count = 35, Icon = "wallet" },
+                    new { Title = "IT & Software", Count = 33, Icon = "terminal" },
+                    new { Title = "Health & Fitness", Count = 37, Icon = "heart-pulse" },
+                };
+            }
+            @foreach (var cat in categories)
+            {
+                <a href="#" class="group block p-6 border border-[#e8edf7] rounded-xl bg-white shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1 hover:border-[#cfe2ff]">
+                    <div class="w-[70px] h-[70px] rounded-full bg-[#f0f4fa] flex items-center justify-center text-[#6c8ab5] transition-colors duration-300 group-hover:bg-[#dbeafe] group-hover:text-[#0d6efd]">
+                        <i data-lucide="@cat.Icon" class="w-7 h-7"></i>
+                    </div>
+                    <h3 class="mt-6 text-[#1e293b] text-xl font-semibold transition-colors duration-300 group-hover:text-[#0d6efd]">@cat.Title</h3>
+                    <p class="mt-2 text-[#0d6efd] font-medium text-sm">@cat.Count Courses</p>
+                </a>
+            }
+        </div>
+    </div>
+</section>

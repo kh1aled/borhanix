@@ -1,0 +1,27 @@
+{
+  "scripts": {
+    "build-css": "npx @tailwindcss/cli -i ./wwwroot/css/site.css -o ./wwwroot/css/output.css --minify",
+    "watch-css": "npx @tailwindcss/cli -i ./wwwroot/css/site.css -o ./wwwroot/css/output.css --watch",
+    "css:watch": "tailwindcss -i ./wwwroot/css/site.css -o ./wwwroot/css/output.css --watch"
+  },
+  "name": "depi-lms",
+  "version": "1.0.0",
+  "description": "**Borhanix** is a modern e-learning platform designed to help learners build real-world skills through high-quality, practical courses.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kh1aled/borhanix.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/kh1aled/borhanix/issues"
+  },
+  "homepage": "https://github.com/kh1aled/borhanix#readme",
+  "dependencies": {
+    "@tailwindcss/cli": "^4.3.1",
+    "tailwindcss": "^4.3.1"
+  }
+}

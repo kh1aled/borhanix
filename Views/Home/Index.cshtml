@@ -1,50 +1,17 @@
 @{
-    ViewData["Title"] = "Modern LMS";
+    ViewData["Title"] = "Borhanix";
     ViewData["PageTitle"] = "DEPI education platform";
+    Layout = "_LandingLayout";
 }
 
-<section class="hero-grid">
-    <div class="hero-copy">
-        <span class="badge"><i data-lucide="sparkles"></i> MVC + EF Core + Identity + AI</span>
-        <h2>Full LMS foundation for a graduation project.</h2>
-        <p>
-            Courses, modules, lessons, assignments, quizzes, grades, approval workflows, QR student cards,
-            QR attendance, role dashboards, and a DeepSeek assistant through OpenRouter.
-        </p>
-        <div class="button-row">
-            <a class="button" asp-controller="Account" asp-action="Register"><i data-lucide="user-plus"></i>Start</a>
-            <a class="button button-ghost" asp-controller="Account" asp-action="Login"><i data-lucide="log-in"></i>Login</a>
-        </div>
-    </div>
-    <div class="hero-panel">
-        <div class="metric-strip">
-            <span><strong>@ViewBag.CourseCount</strong> courses</span>
-            <span><strong>@ViewBag.StudentCount</strong> users</span>
-            <span><strong>3</strong> roles</span>
-        </div>
-        <div class="feature-radar">
-            <div><i data-lucide="qr-code"></i><strong>QR ID</strong><small>Attendance + card</small></div>
-            <div><i data-lucide="brain-circuit"></i><strong>AI</strong><small>DeepSeek assistant</small></div>
-            <div><i data-lucide="shield-check"></i><strong>Identity</strong><small>Role security</small></div>
-            <div><i data-lucide="graduation-cap"></i><strong>LMS</strong><small>Full course flow</small></div>
-        </div>
-    </div>
-</section>
+<partial name="Sections/_HeroSection"/>
 
-<section class="section-grid three">
-    <article class="info-tile">
-        <i data-lucide="route"></i>
-        <h3>Learning path</h3>
-        <p>Course structure supports modules, ordered lessons, assignments, quizzes, grades, and announcements.</p>
-    </article>
-    <article class="info-tile">
-        <i data-lucide="scan-line"></i>
-        <h3>Smart attendance</h3>
-        <p>Each student receives a QR identity payload that instructors scan into attendance sessions.</p>
-    </article>
-    <article class="info-tile">
-        <i data-lucide="messages-square"></i>
-        <h3>AI assistant</h3>
-        <p>OpenRouter integration sends LMS-aware prompts to DeepSeek without storing API keys in source code.</p>
-    </article>
-</section>
+<partial name="Sections/_CategoriesSection" />
+
+<partial name="Sections/_ExploreSection" />
+
+<partial name="Sections/_FeedbackSection" />
+
+<partial name="Sections/_InsightsSection" />
+
+<partial name="Sections/_SubscribeSection" />

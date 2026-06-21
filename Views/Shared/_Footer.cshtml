@@ -1,0 +1,141 @@
+﻿<footer class="border-t border-border/60 bg-background pt-12 text-foreground">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-12">
+
+            <!-- Brand / contact info -->
+            <div class="lg:col-span-3">
+                <a asp-controller="Home" asp-action="Index" class="flex shrink-0 items-center">
+                    <img src="~/images/borhanix-logo.png" alt="Borhanix Logo" class="h-9 w-auto" />
+                </a>
+
+                <address class="not-italic mt-4 leading-relaxed text-foreground/70">
+                    Bani Mazar, Minya Governorate
+                    <br />
+                    Egypt
+                </address>
+
+                <div class="mt-4 flex items-center gap-3">
+                    <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                        <i data-lucide="phone" class="size-5"></i>
+                    </span>
+                    <a href="tel:+01159107545" class="font-semibold transition-colors hover:text-primary">
+                        +20 1159107545
+                    </a>
+                </div>
+
+                <div class="mt-3 flex items-center gap-3">
+                    <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                        <i data-lucide="mail" class="size-5"></i>
+                    </span>
+                    <a href="mailto:support@borhanix.com" class="font-semibold transition-colors hover:text-primary">
+                        support@borhanix.com
+                    </a>
+                </div>
+            </div>
+
+            <!-- Navigations -->
+            <div class="lg:col-span-2">
+                <h3 class="text-base font-bold text-primary">Navigations</h3>
+                <ul class="mt-4 space-y-3">
+                    <li><a asp-controller="Home" asp-action="About" class="text-foreground/70 transition-colors hover:text-primary">About Us</a></li>
+                    <li><a asp-controller="Home" asp-action="Faqs" class="text-foreground/70 transition-colors hover:text-primary">FAQs Page</a></li>
+                    <li><a asp-controller="Checkout" asp-action="Index" class="text-foreground/70 transition-colors hover:text-primary">Checkout</a></li>
+                    <li><a asp-controller="Home" asp-action="Contact" class="text-foreground/70 transition-colors hover:text-primary">Contact</a></li>
+                    <li><a asp-controller="Blog" asp-action="Index" class="text-foreground/70 transition-colors hover:text-primary">Blog</a></li>
+                </ul>
+            </div>
+
+            <!-- New Categories -->
+            <div class="lg:col-span-2">
+                <h3 class="text-base font-bold text-primary">New Categories</h3>
+                <ul class="mt-4 space-y-3">
+                    <li><a asp-controller="Courses" asp-action="Index" asp-route-category="designing" class="text-foreground/70 transition-colors hover:text-primary">Designing</a></li>
+                    <li><a asp-controller="Courses" asp-action="Index" asp-route-category="business" class="text-foreground/70 transition-colors hover:text-primary">Business</a></li>
+                    <li><a asp-controller="Courses" asp-action="Index" asp-route-category="software" class="text-foreground/70 transition-colors hover:text-primary">Software</a></li>
+                    <li><a asp-controller="Courses" asp-action="Index" asp-route-category="wordpress" class="text-foreground/70 transition-colors hover:text-primary">WordPress</a></li>
+                    <li><a asp-controller="Courses" asp-action="Index" asp-route-category="php" class="text-foreground/70 transition-colors hover:text-primary">PHP</a></li>
+                </ul>
+            </div>
+
+            <!-- Help & Support -->
+            <div class="lg:col-span-2">
+                <h3 class="text-base font-bold text-primary">Help &amp; Support</h3>
+                <ul class="mt-4 space-y-3">
+                    <li><a asp-controller="Home" asp-action="Docs" class="text-foreground/70 transition-colors hover:text-primary">Documentation</a></li>
+                    <li><a asp-controller="Home" asp-action="LiveChat" class="text-foreground/70 transition-colors hover:text-primary">Live Chat</a></li>
+                    <li><a asp-controller="Home" asp-action="Contact" class="text-foreground/70 transition-colors hover:text-primary">Mail Us</a></li>
+                    <li><a asp-controller="Home" asp-action="Privacy" class="text-foreground/70 transition-colors hover:text-primary">Privacy</a></li>
+                    <li><a asp-controller="Home" asp-action="Faqs" class="text-foreground/70 transition-colors hover:text-primary">Faqs</a></li>
+                </ul>
+            </div>
+
+            <!-- Download Apps -->
+            <div class="lg:col-span-3">
+                <h3 class="text-base font-bold text-primary">Download Apps</h3>
+                <div class="mt-4 flex flex-col gap-3">
+                    <a href="#" class="flex items-center gap-3 rounded-lg bg-foreground/5 px-4 py-3 transition-colors hover:bg-foreground/10">
+                        <svg viewBox="0 0 24 24" class="size-8 shrink-0" aria-hidden="true">
+                            <path fill="#00C3FF" d="M3.6 2.6c-.3.3-.5.7-.5 1.2v16.4c0 .5.2.9.5 1.2l9.4-9.4-9.4-9.4Z" />
+                            <path fill="#33FF66" d="M16.8 12 4.5 22.3c.3.1.7.1 1 0l.1-.1 13.4-7.6-2.2-2.6Z" />
+                            <path fill="#FF3333" d="M19 9.4 5.6 1.8c-.3-.1-.7-.1-1-.1L16.8 12l2.2-2.6Z" />
+                            <path fill="#FFCC00" d="M19 9.4 16.8 12l2.2 2.6 2.6-1.5c.7-.4.7-1.7 0-2.2L19 9.4Z" />
+                        </svg>
+                        <div class="text-left">
+                            <p class="font-bold leading-tight">Google Play</p>
+                            <p class="text-sm text-foreground/60">Get It Now</p>
+                        </div>
+                    </a>
+
+                    <a href="#" class="flex items-center gap-3 rounded-lg bg-foreground/5 px-4 py-3 transition-colors hover:bg-foreground/10">
+                        <svg viewBox="0 0 384 512" class="size-7 shrink-0 fill-foreground" aria-hidden="true">
+                            <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-90.5-180.6c24.3-28.9 22.1-55.3 21.4-64.7-21.5 1.2-46.4 14.7-60.5 31.5-15.5 17.9-24.6 40.1-22.7 64.4 23.5-.9 47.5-13.8 61.8-31.2z" />
+                        </svg>
+                        <div class="text-left">
+                            <p class="font-bold leading-tight">App Store</p>
+                            <p class="text-sm text-foreground/60">Now It Available</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom bar -->
+        <div class="mt-10 flex flex-col items-center gap-4 border-t border-border/60 py-6 sm:flex-row sm:justify-between">
+            <p class="text-sm text-foreground/70 flex items-center gap-1 flex-wrap">
+                &copy; @DateTime.Now.Year Borhanix. Designed &amp; Developed with by
+                <a href="https://khaled-dev.vercel.app/" target="_blank" rel="noopener noreferrer"
+                   class="font-semibold text-primary transition-colors hover:underline flex items-center gap-1">
+                    <i data-lucide="heart" class="size-4 fill-red-500 text-red-500"></i>
+                   Borhanix Team
+                </a>
+            </p>
+
+            <div class="flex items-center gap-3">
+                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook"
+                   class="flex size-9 items-center justify-center rounded-full bg-foreground/5 text-foreground/70 transition-colors hover:bg-primary hover:text-primary-foreground">
+                    <svg viewBox="0 0 24 24" fill="currentColor" class="size-4" aria-hidden="true">
+                        <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.879V14.89h-2.54v-2.89h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562v1.875h2.773l-.443 2.89h-2.33v6.989C18.343 21.128 22 16.991 22 12Z" />
+                    </svg>
+                </a>
+                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter"
+                   class="flex size-9 items-center justify-center rounded-full bg-foreground/5 text-foreground/70 transition-colors hover:bg-primary hover:text-primary-foreground">
+                    <svg viewBox="0 0 24 24" fill="currentColor" class="size-4" aria-hidden="true">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.451-6.231Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z" />
+                    </svg>
+                </a>
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram"
+                   class="flex size-9 items-center justify-center rounded-full bg-foreground/5 text-foreground/70 transition-colors hover:bg-primary hover:text-primary-foreground">
+                    <svg viewBox="0 0 24 24" fill="currentColor" class="size-4" aria-hidden="true">
+                        <path d="M12 2c-2.717 0-3.056.012-4.123.06-1.064.05-1.79.218-2.428.465a4.902 4.902 0 0 0-1.772 1.153A4.902 4.902 0 0 0 2.525 5.45c-.247.637-.415 1.363-.465 2.428C2.012 8.944 2 9.283 2 12s.012 3.056.06 4.123c.05 1.064.218 1.79.465 2.428a4.902 4.902 0 0 0 1.153 1.772 4.902 4.902 0 0 0 1.772 1.153c.637.247 1.363.415 2.428.465 1.067.048 1.406.06 4.122.06s3.056-.012 4.123-.06c1.064-.05 1.79-.218 2.428-.465a4.902 4.902 0 0 0 1.772-1.153 4.902 4.902 0 0 0 1.153-1.772c.247-.637.415-1.363.465-2.428.048-1.067.06-1.406.06-4.123s-.01-2.987-.06-4.122c-.05-1.065-.218-1.791-.465-2.428a4.902 4.902 0 0 0-1.153-1.772 4.902 4.902 0 0 0-1.772-1.153c-.637-.247-1.364-.415-2.428-.465C15.056 2.012 14.717 2 12 2Zm0 1.802c2.67 0 2.987.01 4.04.058.976.045 1.505.207 1.858.344.466.181.8.399 1.15.748.35.35.567.683.748 1.15.137.353.3.882.344 1.857.048 1.054.058 1.37.058 4.041s-.01 2.987-.058 4.04c-.045.976-.207 1.505-.344 1.858a3.1 3.1 0 0 1-.748 1.15 3.1 3.1 0 0 1-1.15.748c-.353.137-.882.3-1.857.344-1.054.048-1.37.058-4.041.058s-2.987-.01-4.04-.058c-.976-.045-1.505-.207-1.858-.344a3.1 3.1 0 0 1-1.15-.748 3.1 3.1 0 0 1-.748-1.15c-.137-.353-.3-.882-.344-1.857-.048-1.054-.058-1.37-.058-4.041s.01-2.987.058-4.04c.045-.976.207-1.505.344-1.858.181-.466.399-.8.748-1.15.35-.35.683-.567 1.15-.748.353-.137.882-.3 1.857-.344 1.054-.048 1.37-.058 4.041-.058Zm0 3.063a5.135 5.135 0 1 0 0 10.27 5.135 5.135 0 0 0 0-10.27Zm0 8.468a3.333 3.333 0 1 1 0-6.666 3.333 3.333 0 0 1 0 6.666Zm6.538-8.671a1.2 1.2 0 1 1-2.4 0 1.2 1.2 0 0 1 2.4 0Z" />
+                    </svg>
+                </a>
+                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"
+                   class="flex size-9 items-center justify-center rounded-full bg-foreground/5 text-foreground/70 transition-colors hover:bg-primary hover:text-primary-foreground">
+                    <svg viewBox="0 0 24 24" fill="currentColor" class="size-4" aria-hidden="true">
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286ZM5.337 7.433a2.062 2.062 0 1 1 0-4.124 2.062 2.062 0 0 1 0 4.124ZM7.114 20.452H3.558V9h3.556v11.452ZM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003Z" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+</footer>
