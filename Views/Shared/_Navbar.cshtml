@@ -30,14 +30,15 @@
             <!-- Right side controls -->
             <div class="flex items-center gap-2 sm:gap-4">
 
-                <!-- Theme toggle -->
+              @*   <!-- Theme toggle -->
                 <button type="button"
                         id="themeToggle"
                         aria-label="Toggle theme"
                         class="rounded-md p-2 text-foreground transition-colors hover:bg-foreground/5 hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">
                     <i data-lucide="moon" id="themeIconMoon" class="size-5 sm:size-6"></i>
                     <i data-lucide="sun" id="themeIconSun" class="hidden size-5 sm:size-6"></i>
-                </button>
+                </button> *@
+
 
                 <!-- Auth buttons (desktop only) -->
                 <div class="hidden items-center gap-2 sm:flex">
@@ -113,57 +114,3 @@
         </div>
     </div>
 </header>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // Re-render lucide icons after DOM is ready
-        if (window.lucide) lucide.createIcons();
-
-        // Mobile menu toggle
-        const mobileMenuButton = document.getElementById('mobileMenuButton');
-        const mobileMenuPanel = document.getElementById('mobileMenuPanel');
-        const menuIconOpen = document.getElementById('menuIconOpen');
-        const menuIconClose = document.getElementById('menuIconClose');
-
-        mobileMenuButton?.addEventListener('click', () => {
-            const isOpen = !mobileMenuPanel.classList.contains('hidden');
-            mobileMenuPanel.classList.toggle('hidden');
-            menuIconOpen.classList.toggle('hidden', !isOpen);
-            menuIconClose.classList.toggle('hidden', isOpen);
-            mobileMenuButton.setAttribute('aria-expanded', String(!isOpen));
-        });
-
-        // Close mobile menu when a link inside it is clicked
-        mobileMenuPanel?.querySelectorAll('a').forEach((link) => {
-            link.addEventListener('click', () => {
-                mobileMenuPanel.classList.add('hidden');
-                menuIconOpen.classList.remove('hidden');
-                menuIconClose.classList.add('hidden');
-            });
-        });
-
-        // Theme toggle (lazy init, avoids SSR/hydration flash)
-        const themeToggle = document.getElementById('themeToggle');
-        const themeIconMoon = document.getElementById('themeIconMoon');
-        const themeIconSun = document.getElementById('themeIconSun');
-
-        function getStoredTheme() {
-            return localStorage.getItem('theme')
-                || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        }
-
-        function applyTheme(theme) {
-            document.documentElement.classList.toggle('dark', theme === 'dark');
-            localStorage.setItem('theme', theme);
-            themeIconMoon?.classList.toggle('hidden', theme === 'dark');
-            themeIconSun?.classList.toggle('hidden', theme !== 'dark');
-        }
-
-        applyTheme(getStoredTheme());
-
-        themeToggle?.addEventListener('click', () => {
-            const current = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
-            applyTheme(current === 'dark' ? 'light' : 'dark');
-        });
-    });
-</script>

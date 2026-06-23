@@ -14,7 +14,7 @@
     <link href="~/css/output.css" rel="stylesheet" asp-append-version="true" />
 </head>
 
-<body class="bg-slate-100 text-slate-700">
+<body class="text-slate-700 dark:text-slate-200">
 
     <!-- Mobile Overlay -->
     <div id="sidebarOverlay"
@@ -23,13 +23,13 @@
 
     <!-- Sidebar -->
     <aside id="sidebar"
-           class="fixed left-0 top-0 z-50 h-screen w-64 bg-white border-r border-slate-200 shadow-sm
-        -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col">
+           class="fixed left-0 top-0 z-50 h-screen w-64 border-slate-200  shadow-sm
+        -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col bg-white dark:bg-dark-secondary">
 
         <!-- Brand -->
         <a asp-controller="Home"
            asp-action="Index"
-           class="flex items-center justify-center h-24 border-b border-slate-200 bg-white">
+           class="flex items-center justify-center h-24 border-b border-slate-200 dark:border-slate-600">
 
             <img src="~/images/borhanix-logo.png"
                  alt="Borhanix Logo"
@@ -43,49 +43,49 @@
             @if (User.Identity?.IsAuthenticated == true)
             {
                 <a asp-controller="Dashboard" asp-action="Index"
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-600 hover:bg-blue-600 hover:text-white transition
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#444] hover:bg-blue-600 hover:text-white transition
                     @(currentController == "Dashboard"
                            ? "bg-blue-600 text-white"
-                           : "text-slate-600 hover:bg-blue-600 hover:text-white")">
+                          : "text-[#444] hover:bg-blue-600 hover:text-white dark:text-white")">
                     <i data-lucide="layout-dashboard"></i>
                     <span>Dashboard</span>
                 </a>
 
                 <a asp-controller="Profile" asp-action="Index"
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-600 hover:bg-blue-600 hover:text-white transition
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#444] hover:bg-blue-600 hover:text-white transition
 
                     @(currentController == "Profile"
                                               ? "bg-blue-600 text-white"
-                                              : "text-slate-600 hover:bg-blue-600 hover:text-white")">
+                                            : "text-[#444] hover:bg-blue-600 hover:text-white dark:text-white")">
                     <i data-lucide="circle-user-round"></i>
                     <span>Profile</span>
                 </a>
 
                 <a asp-controller="Courses" asp-action="Index"
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-600 hover:bg-blue-600 hover:text-white transition
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#444] hover:bg-blue-600 hover:text-white transition
 
                     @(currentController == "Courses"
                                              ? "bg-blue-600 text-white"
-                                             : "text-slate-600 hover:bg-blue-600 hover:text-white")">
+                                            : "text-[#444] hover:bg-blue-600 hover:text-white dark:text-white")">
                     <i data-lucide="book-open"></i>
                     <span>Courses</span>
                 </a>
 
                 <a asp-controller="Attendance" asp-action="Index"
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-600 hover:bg-blue-600 hover:text-white transition
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#444] hover:bg-blue-600 hover:text-white transition
                     @(currentController == "Attendance"
                                                        ? "bg-blue-600 text-white"
-                                                       : "text-slate-600 hover:bg-blue-600 hover:text-white")">
+                                                      : "text-[#444] hover:bg-blue-600 hover:text-white dark:text-white")">
                     <i data-lucide="qr-code"></i>
                     <span>Attendance</span>
                 </a>
 
                 <a asp-controller="AiAssistant" asp-action="Index"
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-600 hover:bg-blue-600 hover:text-white transition
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#444]hover:bg-blue-600 hover:text-white transition
 
                     @(currentController == "AiAssistant"
                                              ? "bg-blue-600 text-white"
-                                             : "text-slate-600 hover:bg-blue-600 hover:text-white")">
+                                            : "text-[#444] hover:bg-blue-600 hover:text-white dark:text-white")">
                     <i data-lucide="sparkles"></i>
                     <span>AI Assistant</span>
                 </a>
@@ -93,21 +93,21 @@
                 @if (User.IsInRole(AppRoles.Instructor) || User.IsInRole(AppRoles.Admin))
                 {
                     <a asp-controller="InstructorStudio" asp-action="Index"
-                       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-600 hover:bg-blue-600 hover:text-white transition
+                       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#444] hover:bg-blue-600 hover:text-white transition
 
                         @(currentController == "InstructorStudio"
                                                 ? "bg-blue-600 text-white"
-                                                : "text-slate-600 hover:bg-blue-600 hover:text-white")">
+                                               : "text-[#444] hover:bg-blue-600 hover:text-white dark:text-white")">
                         <i data-lucide="presentation"></i>
                         <span>Instructor Studio</span>
                     </a>
 
                     <a asp-controller="Enrollments" asp-action="Pending"
-                       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-600 hover:bg-blue-600 hover:text-white transition
+                       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#444]hover:bg-blue-600 hover:text-white transition
 
                         @(currentController == "Enrollments"
                                                ? "bg-blue-600 text-white"
-                                               : "text-slate-600 hover:bg-blue-600 hover:text-white")">
+                                              : "text-[#444] hover:bg-blue-600 hover:text-white dark:text-white")">
                         <i data-lucide="user-check"></i>
                         <span>Approvals</span>
                     </a>
@@ -116,21 +116,21 @@
                 @if (User.IsInRole(AppRoles.Admin))
                 {
                     <a asp-controller="Admin" asp-action="Index"
-                       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-600 hover:bg-blue-600 hover:text-white transition
+                       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#444] hover:bg-blue-600 hover:text-white transition
 
                         @(currentController == "Admin" && currentAction == "Index"
                                             ? "bg-blue-600 text-white"
-                                            : "text-slate-600 hover:bg-blue-600 hover:text-white")">
+                                           : "text-[#444] hover:bg-blue-600 hover:text-white dark:text-white")">
                         <i data-lucide="shield-check"></i>
                         <span>Admin</span>
                     </a>
 
                     <a asp-controller="Admin" asp-action="Users"
-                       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-600 hover:bg-blue-600 hover:text-white transition
+                       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#444] hover:bg-blue-600 hover:text-white transition
 
                         @(currentController == "Admin" && currentAction == "Users"
                                              ? "bg-blue-600 text-white"
-                                             : "text-slate-600 hover:bg-blue-600 hover:text-white")">
+                                            : "text-[#444] hover:bg-blue-600 hover:text-white dark:text-white")">
                         <i data-lucide="users-round"></i>
                         <span>Users</span>
                     </a>
@@ -139,31 +139,31 @@
             else
             {
                 <a asp-controller="Home" asp-action="Index"
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-600 hover:bg-blue-600 hover:text-white transition 
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#444] hover:bg-blue-600 hover:text-white transition 
 
                     @(currentController == "Home"
                                          ? "bg-blue-600 text-white"
-                                         : "text-slate-600 hover:bg-blue-600 hover:text-white")">
+                                        : "text-[#444] hover:bg-blue-600 hover:text-white dark:text-white")">
                     <i data-lucide="home"></i>
                     <span>Overview</span>
                 </a>
 
                 <a asp-controller="Account" asp-action="Login"
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-600 hover:bg-blue-600 hover:text-white transition
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#444] hover:bg-blue-600 hover:text-white transition
 
                     @(currentController == "Account" && currentAction == "Login"
                                         ? "bg-blue-600 text-white"
-                                        : "text-slate-600 hover:bg-blue-600 hover:text-white")">
+                                       : "text-[#444] hover:bg-blue-600 hover:text-white dark:text-white")">
                     <i data-lucide="log-in"></i>
                     <span>Login</span>
                 </a>
 
                 <a asp-controller="Account" asp-action="Register"
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-600 hover:bg-blue-600 hover:text-white transition 
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#444]hover:bg-blue-600 hover:text-white transition 
 
                     @(currentController == "Account" && currentAction == "Register"
                                         ? "bg-blue-600 text-white"
-                                        : "text-slate-600 hover:bg-blue-600 hover:text-white")">
+                                       : "text-[#444] hover:bg-blue-600 hover:text-white dark:text-white")">
                     <i data-lucide="user-plus"></i>
                     <span>Register</span>
                 </a>
@@ -175,7 +175,7 @@
     <main class="lg:ml-64 min-h-screen">
 
         <!-- Header -->
-        <header class="sticky top-0 z-30 h-16 bg-white border-b border-slate-200 shadow-sm flex items-center justify-between px-4 lg:px-6">
+        <header class="sticky top-0 z-30 h-16 border-b border-slate-200 dark:border-slate-600 shadow-sm flex items-center justify-between px-4 lg:px-6 bg-white dark:bg-dark-secondary">
 
             <div class="flex items-center gap-3">
 
@@ -185,11 +185,11 @@
                 </button>
 
                 <div>
-                    <p class="text-xs text-slate-400">
+                    <p class="text-xs">
                         @DateTime.Now.ToString("dddd, MMM d")
                     </p>
 
-                    <h1 class="font-bold text-slate-900">
+                    <h1 class="font-bold">
                         @(ViewData["PageTitle"] ?? ViewData["Title"] ?? "Borhanix")
                     </h1>
                 </div>
@@ -197,14 +197,19 @@
 
             <div class="flex items-center gap-2">
 
-                <button id="themeToggle"
-                        class="p-2 rounded-lg hover:bg-slate-100">
-                    <i data-lucide="moon"></i>
+                <!-- Theme toggle -->
+                <button type="button"
+                        id="themeToggle"
+                        aria-label="Toggle theme"
+                        class="rounded-md p-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+                    <i data-lucide="moon" id="themeIconMoon" class="size-5 sm:size-6"></i>
+                    <i data-lucide="sun" id="themeIconSun" class="hidden size-5 sm:size-6"></i>
                 </button>
+
 
                 @if (User.Identity?.IsAuthenticated == true)
                 {
-                    <span class="hidden md:flex items-center gap-2 px-3 py-2 bg-slate-100 rounded-full text-sm">
+                    <span class="hidden md:flex items-center gap-2 px-3 py-2 rounded-full text-sm">
                         <i data-lucide="circle-user-round"></i>
                         @User.Identity.Name
                     </span>
@@ -220,13 +225,18 @@
                 {
                     <a asp-controller="Account"
                        asp-action="Login"
-                       class="px-4 py-2 rounded-lg border border-slate-200 hover:bg-slate-50">
+                       class="px-4 py-2 rounded-lg border border-slate-200 @(currentController == "Account" && currentAction == "Login"
+                                                               ? "bg-blue-600 text-white"
+                                                              : "text-[#444] hover:bg-blue-600 hover:text-white dark:text-white")">
                         Login
                     </a>
 
                     <a asp-controller="Account"
                        asp-action="Register"
-                       class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700">
+                       class="px-4 py-2 rounded-lg
+                        @(currentController == "Account" && currentAction == "Register"
+                                                               ? "bg-blue-600 text-white"
+                                                              : "text-[#444] hover:bg-blue-600 hover:text-white dark:text-white")">
                         Register
                     </a>
                 }
