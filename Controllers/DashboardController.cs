@@ -55,10 +55,10 @@ public class DashboardController(ApplicationDbContext db, UserManager<Applicatio
             UserName = user.FullName,
             Stats =
             [
-                new("Active courses", approvedCourseIds.Count.ToString(), "Approved enrollments", "book-open", "cyan"),
-                new("Pending approvals", enrollments.Count(x => x.Status == EnrollmentStatus.Pending).ToString(), "Waiting for instructors", "clock", "amber"),
-                new("Grade average", gradeItems.Count == 0 ? "-" : $"{gradeItems.Average(x => x.Score / x.MaxScore) * 100:0}%", "Across graded work", "chart-no-axes-column", "green"),
-                new("Attendance scans", attendance.Count.ToString(), "QR/ID card records", "qr-code", "violet")
+                new("Active courses", approvedCourseIds.Count.ToString(), "book-open"),
+                new("Pending approvals", enrollments.Count(x => x.Status == EnrollmentStatus.Pending).ToString(), "clock"),
+                new("Grade average", gradeItems.Count == 0 ? "-" : $"{gradeItems.Average(x => x.Score / x.MaxScore) * 100:0}%", "chart-no-axes-column"),
+                new("Attendance scans", attendance.Count.ToString(), "qr-code")
             ],
             Courses = enrollments.Select(x => ToCard(x.Course, x.Status)).ToList(),
             Activity = gradeItems
@@ -91,10 +91,10 @@ public class DashboardController(ApplicationDbContext db, UserManager<Applicatio
             UserName = user.FullName,
             Stats =
             [
-                new("My courses", courses.Count.ToString(), "Published and draft", "presentation", "cyan"),
-                new("Pending approvals", pending.ToString(), "Enrollment requests", "user-check", "amber"),
-                new("Attendance sessions", sessions.ToString(), "QR-enabled classes", "scan-line", "green"),
-                new("To grade", submissions.ToString(), "Assignment submissions", "clipboard-check", "violet")
+                new("My courses", courses.Count.ToString(), "presentation"),
+                new("Pending approvals", pending.ToString(), "user-check"),
+                new("Attendance sessions", sessions.ToString(), "scan-line"),
+                new("To grade", submissions.ToString(), "clipboard-check")
             ],
             Courses = courses.Select(x => ToCard(x, null)).ToList(),
             Activity = await db.Announcements
@@ -108,16 +108,25 @@ public class DashboardController(ApplicationDbContext db, UserManager<Applicatio
 
     private async Task<DashboardViewModel> BuildAdminDashboardAsync(ApplicationUser user)
     {
+        var students = await userManager.GetUsersInRoleAsync(AppRoles.Student);
+        var instructors = await userManager.GetUsersInRoleAsync(AppRoles.Instructor);
+        var instructorsPendingCount = (await userManager.GetUsersInRoleAsync(AppRoles.Instructor)).Count(x => !x.IsApproved);
+        var instructorsApprovedCount = (await userManager.GetUsersInRoleAsync(AppRoles.Instructor)).Count(x => x.IsApproved);
+
         return new DashboardViewModel
         {
             Role = AppRoles.Admin,
             UserName = user.FullName,
             Stats =
             [
-                new("Users", (await db.Users.CountAsync()).ToString(), "Students, instructors, admins", "users", "cyan"),
-                new("Courses", (await db.Courses.CountAsync()).ToString(), "All LMS courses", "layers-3", "green"),
-                new("Pending enrollments", (await db.Enrollments.CountAsync(x => x.Status == EnrollmentStatus.Pending)).ToString(), "Need review", "badge-alert", "amber"),
-                new("AI conversations", (await db.AiConversations.CountAsync()).ToString(), "OpenRouter usage trail", "sparkles", "violet")
+                new("Student Registered" , students.Count.ToString() ,"graduation-cap"),
+                new("Instructors" , instructors.Count.ToString(), "user-round"),
+                new("Instructors Pending for Approval" , instructorsPendingCount.ToString(), "user-round"),
+                new("Instructors Approved" , instructorsApprovedCount.ToString() , "user-round"),
+                new("Users", (await db.Users.CountAsync()).ToString(), "users"),
+                new("Courses", (await db.Courses.CountAsync()).ToString(), "book-open"),
+                new("Pending enrollments", (await db.Enrollments.CountAsync(x => x.Status == EnrollmentStatus.Pending)).ToString(), "badge-alert"),
+                new("AI conversations", (await db.AiConversations.CountAsync()).ToString(), "sparkles")
             ],
             Courses = (await db.Courses
                 .Include(x => x.Modules)

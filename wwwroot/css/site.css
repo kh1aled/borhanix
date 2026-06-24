@@ -92,71 +92,7 @@ button, input, select, textarea {
     min-height: 100vh;
 }
 
-/* ── Brand ───────────────────────────────────────────────────── */
-/*.brand {
-    display: flex;
-    align-items: center;
-    gap: .75rem;
-    padding: .65rem;
-    border-radius: var(--radius);
-}
 
-.brand-mark {
-    display: inline-grid;
-    place-items: center;
-    width: 2.45rem;
-    height: 2.45rem;
-    border-radius: var(--radius);
-    background: linear-gradient(135deg, #0891b2, #7c3aed);
-    color: #fff;
-    font-weight: 900;
-}
-
-.brand strong, .brand small {
-    display: block;
-}
-
-.brand small {
-    color: var(--muted);
-    margin-top: .1rem;
-}*/
-
-/* ── Nav ─────────────────────────────────────────────────────── */
-/*.nav-stack {
-    display: grid;
-    gap: .35rem;
-    margin-top: 1.75rem;
-}
-
-    .nav-stack a {
-        display: flex;
-        align-items: center;
-        gap: .75rem;
-        padding: .78rem .8rem;
-        border-radius: var(--radius);
-        color: #334155;
-        font-weight: 700;
-        transition: background 0.15s ease, color 0.15s ease;
-    }
-
-        .nav-stack a:hover {
-            background: var(--surface-2);
-            color: var(--ink);
-        }
-
-.dark .nav-stack a {
-    color: var(--ink);
-}
-*/
-/*.nav-stack svg,
-.button svg, .icon-button svg,
-.badge svg, .alert svg,
-.stat-card svg, .info-tile svg {
-    width: 1.08rem;
-    height: 1.08rem;
-    flex: 0 0 auto;
-}
-*/
 /* ── Main content ────────────────────────────────────────────── */
 .main {
     min-width: 0;

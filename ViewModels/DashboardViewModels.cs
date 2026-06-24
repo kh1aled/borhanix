@@ -2,7 +2,7 @@ using DepiLms.Models;
 
 namespace DepiLms.ViewModels;
 
-public record StatCard(string Label, string Value, string Hint, string Icon, string Tone);
+public record StatCard(string Label, string Value, string Icon);
 public record ActivityItem(string Title, string Detail, string Type, DateTimeOffset At);
 
 public class DashboardViewModel
