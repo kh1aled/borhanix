@@ -49,6 +49,12 @@
     --color-danger: #EF4444;
 }
 
+
+@layer components {
+    .main_card {
+        @apply bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700;
+    }
+}
 /* ── Reset ───────────────────────────────────────────────────── */
 *, *::before, *::after {
     box-sizing: border-box;

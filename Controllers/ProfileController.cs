@@ -12,6 +12,7 @@ namespace DepiLms.Controllers;
 public class ProfileController(
     ApplicationDbContext db,
     UserManager<ApplicationUser> userManager,
+      SignInManager<ApplicationUser> signInManager,
     IWebHostEnvironment environment) : Controller
 {
     public async Task<IActionResult> Index()
@@ -26,8 +27,22 @@ public class ProfileController(
         return View(model);
     }
 
+    public async Task<IActionResult> Edit()
+    {
+        var user = await LoadCurrentUserAsync();
+        if (user is null)
+        {
+            return Challenge();
+        }
+
+        var model = await BuildModelAsync(user);
+        return View(model);
+    }
+
+
+
     [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> Update(ProfileViewModel model)
+    public async Task<IActionResult> Update(UpdateProfileViewModel model)
     {
         var user = await LoadCurrentUserAsync();
         if (user is null)
@@ -49,9 +64,6 @@ public class ProfileController(
         if (!ModelState.IsValid)
         {
             model.ProfilePhotoUrl = user.ProfilePhotoUrl;
-            model.IsStudent = user.StudentProfile is not null;
-            model.IsInstructor = user.InstructorProfile is not null;
-            model.IsApproved = user.IsApproved;
             return View("Index", model);
         }
 
@@ -98,6 +110,7 @@ public class ProfileController(
             FullName = user.FullName,
             PhoneNumber = user.PhoneNumber,
             Bio = user.Bio,
+            Email = user.Email,
             AvatarColor = user.AvatarColor,
             ProfilePhotoUrl = user.ProfilePhotoUrl,
             IsApproved = user.IsApproved,
@@ -108,7 +121,6 @@ public class ProfileController(
             EmergencyContactOrOfficeHours = user.StudentProfile?.EmergencyContact ?? user.InstructorProfile?.OfficeHours
         };
     }
-
     private async Task<string?> SaveProfilePhotoAsync(IFormFile? file)
     {
         if (file is null || file.Length == 0)
@@ -134,4 +146,92 @@ public class ProfileController(
 
         return $"/uploads/profiles/{fileName}";
     }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdatePassword(ChangePasswordViewModel model)
+    {
+        var user = await LoadCurrentUserAsync();
+
+        if (user == null)
+            return Challenge();
+
+        var profileModel = await BuildModelAsync(user);
+
+
+        if (!ModelState.IsValid)
+        {
+            TempData["PasswordErrors"] = ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(e => e.ErrorMessage)
+                .ToArray();
+
+            return View("Edit", profileModel);
+        }
+
+        if (user is null)
+            return Challenge();
+
+        var result = await userManager.ChangePasswordAsync(
+            user,
+            model.CurrentPassword,
+            model.NewPassword);
+
+        if (!result.Succeeded)
+        {
+            TempData["PasswordErrors"] = result.Errors
+                .Select(e => e.Description)
+                .ToArray();
+
+            return View("Edit", profileModel);
+        }
+
+        TempData["Status"] = "Password updated successfully.";
+        return View("Edit", profileModel);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateEmail(ChangeEmailViewModel model)
+    {
+        var user = await LoadCurrentUserAsync();
+
+        if (user == null)
+            return Challenge();
+
+        var profileModel = await BuildModelAsync(user);
+
+        if (!ModelState.IsValid)
+            return View("Edit", profileModel);
+
+
+        if (user is null)
+            return Challenge();
+
+        var token = await userManager.GenerateChangeEmailTokenAsync(user, model.NewEmail);
+
+        var result = await userManager.ChangeEmailAsync(user, model.NewEmail, token);
+
+        if (!result.Succeeded)
+        {
+            foreach (var error in result.Errors)
+                ModelState.AddModelError("", error.Description);
+
+            return View("Edit", profileModel);
+        }
+
+        await userManager.SetUserNameAsync(user, model.NewEmail);
+
+        user.IsApproved = false;
+
+        await userManager.UpdateAsync(user);
+
+        await signInManager.SignOutAsync();
+
+        TempData["Status"] =
+            "Email updated successfully. Please login again.";
+
+        return RedirectToAction("Login", "Account");
+    }
 }
+

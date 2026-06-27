@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Http;
 
 namespace DepiLms.ViewModels;
 
@@ -7,6 +6,9 @@ public class ProfileViewModel
 {
     [Required, MaxLength(120)]
     public string FullName { get; set; } = string.Empty;
+
+    [Required, EmailAddress]
+    public string Email { get; set; } = string.Empty;
 
     [Phone, MaxLength(40)]
     public string? PhoneNumber { get; set; }

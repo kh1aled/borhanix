@@ -1,0 +1,322 @@
+@model ProfileViewModel
+@{
+    ViewData["Title"] = "Edit Profile";
+    ViewData["PageTitle"] = "Edit Profile";
+
+    <!-- Build initials for avatar preview -->
+    var initials = Model.FullName
+        .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        .Select(x => x[0])
+        .Take(2)
+        .Aggregate("", (a, b) => a + b);
+}
+
+<div class="min-h-screen">
+
+    <!-- ===== Page Header with back link ===== -->
+    <div class="mb-6 flex items-center gap-3">
+        <a asp-action="Index"
+           class="flex items-center justify-center w-9 h-9 rounded-xl border border-gray-200 dark:border-gray-700
+            text-gray-500 dark:text-gray-400 hover:border-primary hover:text-primary transition-colors">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        </a>
+        <div>
+            <h1 class="text-xl font-bold text-gray-900 dark:text-white">Edit Profile</h1>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Update your personal information and account settings</p>
+        </div>
+    </div>
+
+    <!-- ===== Status / success message ===== -->
+    @if (TempData["Status"] != null)
+    {
+        <div class="mb-5 flex items-center gap-3 px-4 py-3 rounded-xl
+            bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+            <i data-lucide="circle-check" class="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0"></i>
+            <p class="text-sm text-emerald-700 dark:text-emerald-400">@TempData["Status"]</p>
+        </div>
+    }
+
+    <div class="flex flex-col lg:flex-row gap-6">
+
+        <!-- ===== LEFT: Profile Preview Card (sticky sidebar) ===== -->
+        <aside class="w-full lg:w-72 xl:w-80 shrink-0">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden lg:sticky lg:top-6">
+
+                <!-- Avatar -->
+                <div class="flex flex-col items-center px-6 pt-8 pb-6 border-b border-gray-100 dark:border-gray-700">
+                    <div class="relative mb-4">
+                        @if (!string.IsNullOrWhiteSpace(Model.ProfilePhotoUrl))
+                        {
+                            <img src="@Model.ProfilePhotoUrl"
+                                 alt="@Model.FullName"
+                                 class="w-24 h-24 rounded-full object-cover ring-4 ring-white dark:ring-gray-800 shadow-md" />
+                        }
+                        else
+                        {
+                            <div class="w-24 h-24 rounded-full flex items-center justify-center text-white text-2xl font-bold
+                                shadow-md ring-4 ring-white dark:ring-gray-800"
+                                 style="background-color: @Model.AvatarColor">
+                                @initials
+                            </div>
+                        }
+                        <!-- Approval indicator dot -->
+                        <span class="absolute bottom-0 right-0 w-6 h-6 rounded-full border-2 border-white dark:border-gray-800
+                        @(Model.IsApproved ? "bg-emerald-400" : "bg-amber-400")"></span>
+                    </div>
+
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">@Model.FullName</h2>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">@Model.ProgramOrDepartment</p>
+
+                    <!-- Approval badge -->
+                    <span class="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium
+                        @(Model.IsApproved
+                              ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+                              : "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400")">
+                        <span class="w-1.5 h-1.5 rounded-full @(Model.IsApproved ? "bg-emerald-500" : "bg-amber-500")"></span>
+                        @(Model.IsApproved ? "Approved" : "Pending approval")
+                    </span>
+
+                    <!-- Student Card shortcut (students only) -->
+                    @if (Model.IsStudent)
+                    {
+                        <a asp-controller="Attendance" asp-action="StudentCard"
+                           class="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl
+                            border border-gray-200 dark:border-gray-600 text-sm font-medium
+                            text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                            <i data-lucide="id-card" class="w-4 h-4"></i>
+                            Student Card
+                        </a>
+                    }
+                </div>
+
+                <!-- Info snapshot -->
+                <div class="px-6 py-5 space-y-4">
+                    <div>
+                        <p class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Email</p>
+                        <p class="text-sm text-gray-800 dark:text-gray-200 truncate">@Model.Email</p>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Phone</p>
+                        <p class="text-sm text-gray-800 dark:text-gray-200">
+                            @(string.IsNullOrWhiteSpace(Model.PhoneNumber) ? "N/A" : Model.PhoneNumber)
+                        </p>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Level / Title</p>
+                        <p class="text-sm text-gray-800 dark:text-gray-200">
+                            @(string.IsNullOrWhiteSpace(Model.LevelOrTitle) ? "N/A" : Model.LevelOrTitle)
+                        </p>
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(Model.Bio))
+                    {
+                        <div>
+                            <p class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Bio</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-3">@Model.Bio</p>
+                        </div>
+                    }
+                </div>
+
+                <!-- Back to profile -->
+                <div class="px-6 pb-5">
+                    <a asp-action="Index"
+                       class="flex items-center justify-center gap-2 w-full px-4 py-2 rounded-xl text-sm font-medium
+                        text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-600
+                        hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                        Back to Profile
+                    </a>
+                </div>
+
+            </div>
+        </aside>
+
+
+        <!-- ===== RIGHT: Forms Stack ===== -->
+        <div class="flex-1 min-w-0 space-y-6">
+
+            <!-- ===== 1. Personal Info Form ===== -->
+            <form asp-action="Update" method="post" enctype="multipart/form-data"
+                  class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+
+                <!-- Section header -->
+                <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-100 dark:border-gray-700">
+                    <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-primary/10 dark:bg-primary/20">
+                        <i data-lucide="circle-user-round" class="w-5 h-5 text-primary"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-semibold text-gray-900 dark:text-white">Personal Information</h2>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Update your name, contact, and other details</p>
+                    </div>
+                </div>
+
+                <div class="px-6 py-6 space-y-5">
+
+                    <!-- Row 1: Full Name + Phone -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <label asp-for="FullName" class="block text-sm font-medium text-gray-700 dark:text-gray-300"></label>
+                            <input asp-for="FullName"
+                                   class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600
+                            bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                            placeholder-gray-400 dark:placeholder-gray-500 text-sm
+                            focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow" />
+                            <span asp-validation-for="FullName" class="text-xs text-red-500"></span>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label asp-for="PhoneNumber" class="block text-sm font-medium text-gray-700 dark:text-gray-300"></label>
+                            <input asp-for="PhoneNumber"
+                                   class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600
+                            bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                            placeholder-gray-400 dark:placeholder-gray-500 text-sm
+                            focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow" />
+                            <span asp-validation-for="PhoneNumber" class="text-xs text-red-500"></span>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Program + Level -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <label asp-for="ProgramOrDepartment"
+                                   class="block text-sm font-medium text-gray-700 dark:text-gray-300">Program / Department</label>
+                            <input asp-for="ProgramOrDepartment"
+                                   class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600
+                            bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                            placeholder-gray-400 dark:placeholder-gray-500 text-sm
+                            focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow" />
+                        </div>
+                        <div class="space-y-1.5">
+                            <label asp-for="LevelOrTitle"
+                                   class="block text-sm font-medium text-gray-700 dark:text-gray-300">Level / Title</label>
+                            <input asp-for="LevelOrTitle"
+                                   class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600
+                            bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                            placeholder-gray-400 dark:placeholder-gray-500 text-sm
+                            focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow" />
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Emergency Contact + Avatar Color -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <label asp-for="EmergencyContactOrOfficeHours"
+                                   class="block text-sm font-medium text-gray-700 dark:text-gray-300">Emergency Contact / Office Hours</label>
+                            <input asp-for="EmergencyContactOrOfficeHours"
+                                   class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600
+                            bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                            placeholder-gray-400 dark:placeholder-gray-500 text-sm
+                            focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow" />
+                        </div>
+                        <div class="space-y-1.5">
+                            <label asp-for="AvatarColor" class="block text-sm font-medium text-gray-700 dark:text-gray-300"></label>
+                            <div class="flex items-center gap-3 h-[42px]">
+                                <input asp-for="AvatarColor" type="color"
+                                       class="h-10 w-16 rounded-lg border border-gray-200 dark:border-gray-600
+                                bg-white dark:bg-gray-700 cursor-pointer p-1
+                                focus:outline-none focus:ring-2 focus:ring-primary" />
+                                <span class="text-xs text-gray-500 dark:text-gray-400">Avatar background color</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bio -->
+                    <div class="space-y-1.5">
+                        <label asp-for="Bio" class="block text-sm font-medium text-gray-700 dark:text-gray-300"></label>
+                        <textarea asp-for="Bio" rows="4"
+                                  class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600
+                        bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                        placeholder-gray-400 dark:placeholder-gray-500 text-sm resize-none
+                        focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
+                                  placeholder="Tell others a little about yourself…"></textarea>
+                    </div>
+
+                    <!-- Photo Upload Drop Zone -->
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Profile Photo</label>
+                        <label for="@Html.IdFor(m => m.ProfilePhoto)"
+                               class="flex flex-col items-center justify-center w-full h-32 rounded-xl border-2 border-dashed
+                            border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50
+                            hover:bg-primary/5 dark:hover:bg-primary/10 hover:border-primary
+                            cursor-pointer transition-colors group">
+                            <div class="flex flex-col items-center gap-1.5 pointer-events-none">
+                                <i data-lucide="upload-cloud"
+                                   class="w-8 h-8 text-gray-400 dark:text-gray-500 group-hover:text-primary transition-colors"></i>
+                                <span id="upload-label"
+                                      class="text-sm text-gray-500 dark:text-gray-400 group-hover:text-primary transition-colors">
+                                    Drop or click to select a photo
+                                </span>
+                                <span class="text-xs text-gray-400 dark:text-gray-500">JPG, PNG, WebP — max 15 MB</span>
+                            </div>
+                            <!-- Hidden file input — all ASP.NET tag helpers preserved -->
+                            <input asp-for="ProfilePhoto" type="file" accept=".jpg,.jpeg,.png,.webp" class="sr-only" />
+                        </label>
+                        <span asp-validation-for="ProfilePhoto" class="text-xs text-red-500"></span>
+                    </div>
+
+                </div>
+
+                <!-- Form footer -->
+                <div class="flex items-center justify-end gap-3 px-6 py-4
+                    bg-gray-50 dark:bg-gray-800/50 rounded-b-2xl border-t border-gray-100 dark:border-gray-700">
+                    <button type="reset"
+                            class="px-4 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-400
+                        hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                        Reset
+                    </button>
+                    <button type="submit"
+                            class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium
+                        bg-primary hover:bg-primary/90 active:bg-primary/80 text-white shadow-sm
+                        transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                        <i data-lucide="save" class="w-4 h-4"></i>
+                        Save Profile
+                    </button>
+                </div>
+
+            </form>
+
+
+
+            <!-- ===== 2. Update Password Form ===== -->
+            <partial name="_ChangePassword"
+                     model="new ChangePasswordViewModel()" />
+
+            <!-- ===== 3. Update Email Form ===== -->
+            <partial name="_ChangeEmail"
+                     model="new ChangeEmailViewModel()" />
+            
+
+        </div>
+        <!-- END RIGHT FORMS STACK -->
+
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Show selected filename inside the upload drop zone
+        const fileInput = document.getElementById('@Html.IdFor(m => m.ProfilePhoto)');
+        const uploadLabel = document.getElementById('upload-label');
+        if (fileInput && uploadLabel) {
+            fileInput.addEventListener('change', function () {
+                if (this.files.length > 0) {
+                    uploadLabel.textContent = this.files[0].name;
+                }
+            });
+        }
+
+        // Toggle password visibility (eye icon button)
+        function togglePassword(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                input.type = 'password';
+                icon.setAttribute('data-lucide', 'eye');
+            }
+            // Re-initialize Lucide for the swapped icon
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+    </script>
+}
