@@ -2,97 +2,307 @@
 @{
     ViewData["Title"] = Model.Course.Title;
     ViewData["PageTitle"] = Model.Course.Code;
+
+    var totalLessons = Model.Course.Modules.Sum(x => x.Lessons.Count);
+    var approvedStudents = Model.Course.Enrollments.Count(x => x.Status == EnrollmentStatus.Approved);
 }
 
-<section class="course-hero" style="--accent:@Model.Course.AccentColor">
-    <div>
-        <span class="badge"><i data-lucide="book-open"></i>@Model.Course.Category</span>
-        <h2>@Model.Course.Title</h2>
-        <p>@Model.Course.Description</p>
-        <div class="course-meta">
-            <span>@Model.Course.Level</span>
-            <span>@Model.Course.Modules.Count modules</span>
-            <span>@Model.Course.Modules.Sum(x => x.Lessons.Count) lessons</span>
-            <span>@Model.Course.Enrollments.Count(x => x.Status == EnrollmentStatus.Approved) approved students</span>
-        </div>
-    </div>
-    <div class="hero-actions">
-        @if (Model.CanRequestEnrollment)
-        {
-            <form asp-action="Enroll" method="post">
-                <input type="hidden" name="id" value="@Model.Course.Id" />
-                <button class="button" type="submit"><i data-lucide="send"></i>Request enrollment</button>
-            </form>
-        }
-        else if (Model.Enrollment is not null)
-        {
-            <span class="status-pill">@Model.Enrollment.Status</span>
-        }
-        @if (Model.CanManage)
-        {
-            <a class="button button-ghost" asp-controller="InstructorStudio" asp-action="Index"><i data-lucide="settings"></i>Manage</a>
-        }
-    </div>
-</section>
+@* ── Hero Banner ─────────────────────────────────────────────────────── *@
+<div class="relative overflow-hidden bg-slate-100 dark:bg-slate-800 px-4 pb-10 pt-6 lg:px-10">
 
-<section class="content-grid wide-left">
-    <div>
-        <div class="section-heading">
-            <h2>Modules and lessons</h2>
+    @* Faint watermark icon *@
+    <div class="pointer-events-none absolute -left-6 top-1/2 -translate-y-1/2 opacity-[0.07] dark:opacity-[0.04]">
+        <i data-lucide="code-2" class="h-64 w-64 text-primary"></i>
+    </div>
+
+    <div class="relative mx-auto max-w-screen-xl">
+
+        @* Breadcrumb *@
+        <nav class="mb-4 flex items-center gap-1 text-sm">
+            <a href="/" class="text-slate-500 hover:text-primary dark:text-slate-400 transition">Home</a>
+            <i data-lucide="chevron-right" class="h-4 w-4 text-slate-400"></i>
+            <a href="/courses" class="text-slate-500 hover:text-primary dark:text-slate-400 transition">Courses</a>
+            <i data-lucide="chevron-right" class="h-4 w-4 text-slate-400"></i>
+            <span class="font-medium text-primary">@Model.Course.Title</span>
+        </nav>
+
+        <div class="flex flex-col gap-8 lg:flex-row lg:items-start">
+
+            @* Left: title + meta *@
+            <div class="flex-1">
+                <h1 class="text-2xl font-extrabold uppercase tracking-tight text-slate-800 dark:text-white lg:text-3xl 2xl:text-4xl">
+                    @Model.Course.Title
+                </h1>
+
+                <div class="mt-4 flex flex-wrap items-center gap-6 text-sm text-slate-600 dark:text-slate-300">
+                    <span class="flex items-center gap-1.5 border-e border-slate-300 pe-6 dark:border-slate-600">
+                        <i data-lucide="user" class="h-4 w-4 text-primary"></i>
+                        Instructor Name
+                    </span>
+                    <span class="flex items-center gap-1.5 border-e border-slate-300 pe-6 dark:border-slate-600">
+                        <i data-lucide="globe" class="h-4 w-4 text-primary"></i>
+                        @Model.Course.Category
+                    </span>
+                    <span class="flex items-center gap-1.5 border-e border-slate-300 pe-6 dark:border-slate-600">
+                        <i data-lucide="bar-chart-2" class="h-4 w-4 text-primary"></i>
+                        @Model.Course.Level
+                    </span>
+                    <span class="flex items-center gap-1.5 border-e border-slate-300 pe-6 dark:border-slate-600">
+                        <i data-lucide="layout-list" class="h-4 w-4 text-primary"></i>
+                        @Model.Course.Modules.Count modules
+                    </span>
+                    <span class="flex items-center gap-1.5 border-e border-slate-300 pe-6 dark:border-slate-600">
+                        <i data-lucide="play-circle" class="h-4 w-4 text-primary"></i>
+                        @totalLessons lessons
+                    </span>
+                    <span class="flex items-center gap-1.5">
+                        <i data-lucide="users" class="h-4 w-4 text-primary"></i>
+                        @approvedStudents students
+                    </span>
+                </div>
+            </div>
         </div>
-        <div class="timeline-list">
-            @foreach (var module in Model.Course.Modules.OrderBy(x => x.SortOrder))
-            {
-                <article class="timeline-item">
-                    <span>@module.SortOrder</span>
-                    <div>
-                        <h3>@module.Title</h3>
-                        <p>@module.Summary</p>
-                        <ul class="lesson-list">
-                            @foreach (var lesson in module.Lessons.OrderBy(x => x.SortOrder))
-                            {
-                                <li class="lesson-row">
-                                    <div>
-                                        <i data-lucide="play-circle"></i>
-                                        <strong>@lesson.Title</strong>
-                                        <small>@lesson.DurationMinutes min</small>
-                                    </div>
-                                    @if (!string.IsNullOrWhiteSpace(lesson.VideoUrl))
-                                    {
-                                        <video controls src="@lesson.VideoUrl"></video>
-                                    }
-                                </li>
-                            }
-                        </ul>
+    </div>
+</div>
+
+@* ── Main Content ─────────────────────────────────────────────────────── *@
+<div class="mx-auto max-w-screen-xl px-4 py-10 lg:px-10">
+    <div class="flex flex-col gap-10 lg:flex-row lg:items-start">
+
+        @* Left: Description + Modules *@
+        <div class="flex-1 min-w-0 space-y-10">
+
+            @* About the course *@
+            <section>
+                <h2 class="mb-6 text-xl font-bold text-slate-800 dark:text-white">
+                   About Course
+                </h2>
+
+                @if (!string.IsNullOrWhiteSpace(Model.Course.Description))
+                {
+                    <div class="space-y-4">
+                        <p class="text-sm font-bold text-primary">Course Description:</p>
+                        <p class="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                            @Model.Course.Description
+                        </p>
                     </div>
-                </article>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(Model.Course.Summary))
+                {
+                    <div class="mt-5 space-y-2">
+                        <p class="text-sm font-bold text-primary">About the Instructor:</p>
+                        <p class="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                            @Model.Course.Summary
+                        </p>
+                    </div>
+                }
+            </section>
+
+            @* Modules & Lessons *@
+            @if (Model.Course.Modules.Any())
+            {
+                <section>
+                    <h2 class="mb-6 text-xl font-bold text-slate-800 dark:text-white">
+                        Modules &amp; Lessons
+                    </h2>
+
+                    <div class="space-y-4">
+                        @foreach (var module in Model.Course.Modules.OrderBy(x => x.SortOrder))
+                        {
+                            <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
+                                @* Module header *@
+                                <div class="flex items-center gap-4 border-b border-slate-100 px-5 py-4 dark:border-slate-800">
+                                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
+                                        @module.SortOrder
+                                    </span>
+                                    <div>
+                                        <h3 class="font-semibold text-slate-800 dark:text-white">@module.Title</h3>
+                                        @if (!string.IsNullOrWhiteSpace(module.Summary))
+                                        {
+                                            <p class="mt-0.5 text-xs text-slate-500 dark:text-slate-400">@module.Summary</p>
+                                        }
+                                    </div>
+                                    <span class="ms-auto text-xs text-slate-400">@module.Lessons.Count lessons</span>
+                                </div>
+
+                                @* Lesson list *@
+                                <ul class="divide-y divide-slate-50 dark:divide-slate-800">
+                                    @foreach (var lesson in module.Lessons.OrderBy(x => x.SortOrder))
+                                    {
+                                        <li class="flex items-center gap-3 px-5 py-3">
+                                            <i data-lucide="play-circle" class="h-4 w-4 shrink-0 text-primary"></i>
+                                            <span class="flex-1 text-sm font-medium text-slate-700 dark:text-slate-200">
+                                                @lesson.Title
+                                            </span>
+                                            @if (lesson.DurationMinutes > 0)
+                                            {
+                                                <span class="text-xs text-slate-400">@lesson.DurationMinutes min</span>
+                                            }
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                    </div>
+                </section>
+            }
+
+            @* Assessments *@
+            @if (Model.Course.Assignments.Any() || Model.Course.Quizzes.Any())
+            {
+                <section>
+                    <h2 class="mb-6 text-xl font-bold text-slate-800 dark:text-white">
+                        Assessments
+                    </h2>
+
+                    <div class="space-y-3">
+                        @foreach (var assignment in Model.Course.Assignments.OrderBy(x => x.DueAt))
+                        {
+                            <div class="flex items-center gap-4 rounded-xl border border-slate-200 bg-white px-5 py-4 dark:border-slate-700 dark:bg-slate-900">
+                                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-orange-50 dark:bg-orange-900/20">
+                                    <i data-lucide="clipboard-list" class="h-4 w-4 text-orange-500"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-semibold text-slate-800 dark:text-white">@assignment.Title</p>
+                                    <p class="text-xs text-slate-400">@assignment.MaxPoints pts · Due @assignment.DueAt.ToLocalTime().ToString("MMM d")</p>
+                                </div>
+                                <a asp-controller="Assignments" asp-action="Details" asp-route-id="@assignment.Id"
+                                   class="shrink-0 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">
+                                    Open
+                                </a>
+                            </div>
+                        }
+
+                        @foreach (var quiz in Model.Course.Quizzes)
+                        {
+                            <div class="flex items-center gap-4 rounded-xl border border-slate-200 bg-white px-5 py-4 dark:border-slate-700 dark:bg-slate-900">
+                                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-violet-50 dark:bg-violet-900/20">
+                                    <i data-lucide="help-circle" class="h-4 w-4 text-violet-500"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-semibold text-slate-800 dark:text-white">@quiz.Title</p>
+                                    <p class="text-xs text-slate-400">@quiz.Questions.Count questions · @quiz.TimeLimitMinutes min</p>
+                                </div>
+                                <a asp-controller="Quizzes" asp-action="Take" asp-route-id="@quiz.Id"
+                                   class="shrink-0 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">
+                                    Take Quiz
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </section>
             }
         </div>
-    </div>
 
-    <aside class="activity-panel">
-        <div class="section-heading">
-            <h2>Assessments</h2>
+        @* Right: Sidebar card (sticky on large screens) *@
+        <div class="sticky w-full lg:w-80 xl:w-96 lg:sticky lg:top-6 shrink-0">
+            <div class="overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-700">
+
+                @* Video / Hero image thumbnail *@
+                <div class="relative h-48 w-full overflow-hidden bg-slate-800">
+                    @if (!string.IsNullOrWhiteSpace(Model.Course.HeroImageUrl))
+                    {
+                        <img src="@Model.Course.HeroImageUrl" alt="@Model.Course.Title"
+                             class="h-full w-full object-cover" />
+                    }
+                    else
+                    {
+                        <div class="flex h-full items-center justify-center"
+                             style="background: linear-gradient(135deg, @Model.Course.AccentColor 0%, #1e293b 100%);">
+                            <i data-lucide="play-circle" class="h-14 w-14 text-white/80"></i>
+                        </div>
+                    }
+                    @* Play button overlay *@
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 backdrop-blur-sm ring-2 ring-white/60 transition hover:bg-blue/50">
+                            <i data-lucide="play" class="h-6 w-6 translate-x-0.5 text-white"></i>
+                        </div>
+                    </div>
+                </div>
+
+                @* Course Content panel *@
+                <div class="p-5">
+                    <p class="mb-4 text-center text-sm font-bold uppercase tracking-widest text-slate-700 dark:text-slate-200">
+                        Course Content
+                    </p>
+                    <div class="divide-y divide-slate-100 dark:divide-slate-800">
+
+                        @* Price row *@
+                        <div class="flex items-center justify-between py-3">
+                            <span class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                                <i data-lucide="dollar-sign" class="h-4 w-4 text-primary"></i>
+                                Price:
+                            </span>
+                            <span class="text-sm font-bold text-primary">Free</span>
+                        </div>
+
+                        @* Instructor row *@
+                        <div class="flex items-center justify-between py-3">
+                            <span class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                                <i data-lucide="user" class="h-4 w-4 text-slate-400"></i>
+                                Instructor:
+                            </span>
+                            <span class="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                                Instructor Name
+                            </span>
+                        </div>
+                    </div>
+
+                    @* Stats 2×2 grid *@
+                    <div class="mt-3 grid grid-cols-2 gap-2">
+                        <div class="rounded-xl border border-slate-100 p-3 text-center dark:border-slate-800">
+                            <p class="text-[11px] text-slate-400">Lessons</p>
+                            <p class="text-lg font-bold text-slate-800 dark:text-white">@totalLessons</p>
+                        </div>
+                        <div class="rounded-xl border border-slate-100 p-3 text-center dark:border-slate-800">
+                            <p class="text-[11px] text-slate-400">Modules</p>
+                            <p class="text-lg font-bold text-slate-800 dark:text-white">@Model.Course.Modules.Count</p>
+                        </div>
+                        <div class="rounded-xl border border-slate-100 p-3 text-center dark:border-slate-800">
+                            <p class="text-[11px] text-slate-400">Quizzes</p>
+                            <p class="text-lg font-bold text-slate-800 dark:text-white">@Model.Course.Quizzes.Count</p>
+                        </div>
+                        <div class="rounded-xl border border-slate-100 p-3 text-center dark:border-slate-800">
+                            <p class="text-[11px] text-slate-400">Students</p>
+                            <p class="text-lg font-bold text-slate-800 dark:text-white">@approvedStudents</p>
+                        </div>
+                    </div>
+
+                    @* Enrollment status badge *@
+                    @if (Model.Enrollment is not null)
+                    {
+                        <div class="mt-3 flex items-center justify-center gap-2 rounded-xl bg-slate-50 px-4 py-2.5 text-sm font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+                            <i data-lucide="check-circle-2" class="h-4 w-4 text-green-500"></i>
+                            @Model.Enrollment.Status
+                        </div>
+                    }
+
+                    @* CTA button *@
+                    <div class="mt-4 flex flex-col gap-2">
+                        @if (Model.CanRequestEnrollment)
+                        {
+                            <form asp-action="Enroll" method="post">
+                                <input type="hidden" name="id" value="@Model.Course.Id" />
+                                <button type="submit"
+                                        class="flex w-full items-center justify-center gap-2 rounded-xl bg-slate-800 px-4 py-3.5 text-sm font-bold text-white transition hover:bg-slate-700 dark:bg-primary dark:hover:brightness-110">
+                                    <i data-lucide="send" class="h-4 w-4"></i>
+                                    اذهب إلى الكورس
+                                </button>
+                            </form>
+                        }
+
+                        @if (Model.CanManage)
+                        {
+                            <a asp-controller="InstructorStudio" asp-action="Index"
+                               class="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800">
+                                <i data-lucide="settings" class="h-4 w-4"></i>
+                                Manage Course
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
         </div>
-        @foreach (var assignment in Model.Course.Assignments.OrderBy(x => x.DueAt))
-        {
-            <div class="activity-item">
-                <span>Assignment</span>
-                <strong>@assignment.Title</strong>
-                <small>@assignment.MaxPoints points</small>
-                <time>Due @assignment.DueAt.ToLocalTime().ToString("MMM d")</time>
-                <a asp-controller="Assignments" asp-action="Details" asp-route-id="@assignment.Id">Open assignment</a>
-            </div>
-        }
-        @foreach (var quiz in Model.Course.Quizzes)
-        {
-            <div class="activity-item">
-                <span>Quiz</span>
-                <strong>@quiz.Title</strong>
-                <small>@quiz.Questions.Count questions</small>
-                <time>@quiz.TimeLimitMinutes min</time>
-                <a asp-controller="Quizzes" asp-action="Take" asp-route-id="@quiz.Id">Open quiz</a>
-            </div>
-        }
-    </aside>
-</section>
+    </div>
+</div>

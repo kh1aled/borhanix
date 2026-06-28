@@ -709,6 +709,10 @@ textarea {
         line-height: 1.7;
     }
 
+.course_details_header {
+    background-color: #e2e1f3;
+}
+
 /* ── Timeline ────────────────────────────────────────────────── */
 .timeline-list {
     display: grid;
@@ -933,7 +937,20 @@ summary {
 .dark .reader-box {
     background: var(--surface-2);
 }
+@keyframes scan-line {
+    0%, 100% {
+        top: 10%;
+    }
 
+    50% {
+        top: 85%;
+    }
+}
+
+.animate-scan-line {
+    animation: scan-line 2s ease-in-out infinite;
+    position: absolute;
+}
 /* ── Student card ────────────────────────────────────────────── */
 .student-card-wrap {
     display: grid;

@@ -1,46 +1,115 @@
-@model IReadOnlyCollection<CourseCardViewModel>
+﻿@model IReadOnlyCollection<CourseCardViewModel>
 @{
     ViewData["Title"] = "Courses";
-    ViewData["PageTitle"] = "Course catalog";
+    ViewData["PageTitle"] = "Course Catalog";
 }
 
-<section class="section-heading with-actions">
-    <div>
-        <span class="badge"><i data-lucide="layers-3"></i> Full LMS</span>
-        <h2>Courses</h2>
+<div class="mb-8 flex flex-col gap-4 rounded-2xl border border-slate-100 bg-white px-6 py-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:flex-row sm:items-center sm:justify-between">
+    <div class="space-y-0.5">
+        <p class="text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">Course Catalog</p>
+        <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100">
+            Offering <span class="text-primary">@Model.Count</span> Courses
+        </h1>
     </div>
+
     @if (User.IsInRole(AppRoles.Instructor) || User.IsInRole(AppRoles.Admin))
     {
-        <a class="button" asp-controller="InstructorStudio" asp-action="CreateCourse"><i data-lucide="plus"></i>New course</a>
+        <a class="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow shadow-primary/20 transition hover:-translate-y-0.5 hover:brightness-110 active:scale-95"
+           asp-controller="InstructorStudio" asp-action="CreateCourse">
+            <i data-lucide="plus" class="h-4 w-4"></i>
+            New Course
+        </a>
     }
-</section>
+</div>
 
-<section class="course-grid">
+<section class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
     @foreach (var course in Model)
     {
-        <article class="course-card large" style="--accent:@course.AccentColor">
-            @if (!string.IsNullOrWhiteSpace(course.HeroImageUrl))
-            {
-                <img src="@course.HeroImageUrl" alt="" />
-            }
-            <div>
-                <span>@course.Code</span>
-                <h3>@course.Title</h3>
-                <p>@course.Summary</p>
-                <div class="course-meta">
-                    <span>@course.Category</span>
-                    <span>@course.Level</span>
-                    <span>@course.ModuleCount modules</span>
-                    <span>@course.EnrollmentCount students</span>
+        <a asp-controller="Courses"
+           asp-route-id="@course.Id"
+           asp-action="Details"
+           class="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-100 transition duration-300 hover:-translate-y-1 hover:shadow-xl dark:bg-slate-900 dark:ring-slate-800">
+
+            @* Hero area *@
+            <div class="relative h-52 w-full overflow-hidden"
+                 style="background-color: @(string.IsNullOrWhiteSpace(course.HeroImageUrl) ? (course.AccentColor + "22") : "transparent");">
+
+                @if (string.IsNullOrWhiteSpace(course.HeroImageUrl))
+                {
+                    <div class="flex h-full flex-col items-start justify-center px-6">
+                        <h3 class="text-3xl font-extrabold leading-tight tracking-tight text-slate-800 dark:text-slate-100">
+                            @course.Title
+                        </h3>
+                        <div class="mt-2 h-1 w-10 rounded-full" style="background-color:@course.AccentColor;"></div>
+                    </div>
+                }
+                else
+                {
+                    <img src="@course.HeroImageUrl"
+                         alt="@course.Title"
+                         class="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                }
+
+                @* Level badge — top-left pill like "Pre-learning" *@
+                <span class="absolute left-5 top-3 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white shadow"
+                      style="background-color:@course.AccentColor;">
+                    @course.Level
+                </span>
+            </div>
+
+            @* Card body *@
+            <div class="flex flex-1 flex-col gap-4 p-5">
+
+                @* Code + Category chips *@
+                <div class="flex flex-wrap gap-1.5">
+                    <span class="rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                        @course.Code
+                    </span>
+                    <span class="rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                        @course.Category
+                    </span>
                 </div>
-                <div class="button-row">
-                    <a class="button button-small" asp-action="Details" asp-route-id="@course.Id">Open</a>
-                    @if (course.EnrollmentStatus is not null)
-                    {
-                        <span class="status-pill">@course.EnrollmentStatus</span>
-                    }
+
+                @* Title + summary *@
+                <div class="space-y-1.5">
+                    <h2 class="text-[17px] font-bold leading-snug text-slate-800 dark:text-white">
+                        @course.Title
+                    </h2>
+                    <p class="line-clamp-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+                        @course.Summary
+                    </p>
+                </div>
+
+                @* Stats row *@
+                <div class="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
+                    <span class="flex items-center gap-1.5">
+                        <i data-lucide="layout-list" class="h-4 w-4"></i>
+                        <span>@course.ModuleCount lesson</span>
+                    </span>
+                    <span class="flex items-center gap-1.5">
+                        <i data-lucide="users" class="h-4 w-4"></i>
+                        <span>@course.EnrollmentCount student</span>
+                    </span>
+                </div>
+
+                @* Enrollment status badge (optional) *@
+                @if (course.EnrollmentStatus is not null)
+                {
+                    <div>
+                        <span class="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                            <i data-lucide="check-circle-2" class="h-3 w-3"></i>
+                            @course.EnrollmentStatus
+                        </span>
+                    </div>
+                }
+
+                @* CTA — pushed to bottom, matches reference "Show More Details ←" *@
+                <div class="mt-auto pt-2">
+                    <span class="flex w-full items-center justify-center rounded-xl bg-blue-100 px-4 py-3 text-sm font-semibold text-blue-700 transition group-hover:bg-blue-200 dark:bg-blue-800 dark:text-blue-200 dark:group-hover:bg-blue-700">
+                        Show More Details
+                    </span>
                 </div>
             </div>
-        </article>
+        </a>
     }
 </section>

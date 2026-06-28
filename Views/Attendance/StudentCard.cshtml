@@ -2,37 +2,80 @@
 @{
     ViewData["Title"] = "Student ID";
     ViewData["PageTitle"] = "Student QR ID";
+    var initials = Model.User.FullName
+        .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        .Select(x => x[0])
+        .Take(2)
+        .Aggregate("", (a, b) => a + b);
 }
 
-<section class="student-card-wrap">
-    <article class="student-card">
-        <header>
-            <span class="brand-mark">D</span>
-            <div>
-                <strong>DEPI LMS</strong>
-                <small>Student Identity Card</small>
+<div class="min-h-[70vh] mx-auto max-w-3xl flex items-center justify-center px-4 py-12">
+    <article class="w-full max-w-[320px] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl overflow-hidden shadow-sm">
+
+        @* Sky accent strip *@
+        <div class="h-1.5 bg-primary w-full"></div>
+
+        @* Brand header *@
+        <header class="px-5 py-4 flex items-center gap-3 border-b border-gray-100 dark:border-gray-800">
+            <div class="w-10 h-10 flex items-center justify-center flex-shrink-0">
+                <img src="~/images/borhanix-icon.png" class="w-full h-full">
             </div>
+            <div class="flex-1 min-w-0">
+                <p class="text-sm font-bold text-gray-900 dark:text-white tracking-tight leading-none">Borhanix</p>
+                <p class="text-[9px] text-gray-400 dark:text-gray-500 uppercase tracking-[.1em] mt-1">Learning Management System</p>
+            </div>
+            <span class="text-[9px] font-bold uppercase tracking-[.06em] px-2.5 py-1 rounded-full bg-sky-50 dark:bg-sky-900/30 text-sky-700 dark:text-sky-400 border border-sky-100 dark:border-sky-800 flex-shrink-0">
+                Student
+            </span>
         </header>
 
-        <div class="student-card-body">
-            <div class="student-photo" style="--avatar:@Model.User.AvatarColor">
-                @Model.User.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(x => x[0]).Take(2).Aggregate("", (a, b) => a + b)
-            </div>
-            <div>
-                <span>@Model.Profile.StudentCode</span>
-                <h2>@Model.User.FullName</h2>
-                <p>@Model.Profile.Program</p>
-                <p>@Model.Profile.Level</p>
+        @* Student info *@
+        <div class="px-5 py-5 flex items-center gap-4">
+            <div class="min-w-0">
+                <p class="text-[9px] font-bold font-mono text-primary tracking-[.1em] mb-1.5">@Model.Profile.StudentCode</p>
+                <h2 class="text-[15px] font-bold text-gray-900 dark:text-white leading-snug truncate">@Model.User.FullName</h2>
+                <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 truncate">@Model.Profile.Program</p>
+                <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">@Model.Profile.Level</p>
             </div>
         </div>
 
-        <div class="qr-box">
-            <img class="student-qr" src="@Model.QrImageDataUri" alt="Student QR code for @Model.Profile.StudentCode" width="320" height="320" />
+        @* QR code *@
+        <div class="mx-5 mb-5 bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700 rounded-2xl p-4 flex flex-col items-center gap-2.5">
+            <div class="bg-white dark:bg-white rounded-xl p-2">
+                <img src="@Model.QrImageDataUri"
+                     alt="Student QR code for @Model.Profile.StudentCode"
+                     width="140" height="140"
+                     class="block" />
+            </div>
+            <p class="text-[9px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-[.08em]">Scan to verify identity</p>
         </div>
 
-        <footer>
-            <span>@Model.ApprovedCourses approved courses</span>
-            <span>@Model.AttendanceRate% attendance</span>
+        @* Stats row *@
+        <div class="mx-5 mb-5 grid grid-cols-2 divide-x divide-gray-100 dark:divide-gray-800 bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700 rounded-2xl overflow-hidden">
+            <div class="flex flex-col items-center py-3 px-2">
+                <span class="text-[22px] font-extrabold text-gray-900 dark:text-white leading-none">@Model.ApprovedCourses</span>
+                <span class="text-[9px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-[.07em] mt-1.5">Courses</span>
+            </div>
+            <div class="flex flex-col items-center py-3 px-2">
+                <span class="text-[22px] font-extrabold text-gray-900 dark:text-white leading-none">
+                    @Model.AttendanceRate<span class="text-sm font-medium text-gray-400">%</span>
+                </span>
+                <span class="text-[9px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-[.07em] mt-1.5">Attendance</span>
+            </div>
+        </div>
+
+        @* Footer *@
+        <footer class="px-5 py-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
+            <span class="text-[9px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-[.07em]">
+                Academic year 2024–25
+            </span>
+            <div class="flex gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                <span class="w-1.5 h-1.5 rounded-full bg-gray-200 dark:bg-gray-700"></span>
+            </div>
         </footer>
+
     </article>
-</section>
+</div>
