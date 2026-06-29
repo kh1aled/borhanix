@@ -1,48 +1,110 @@
 @model CourseEditViewModel
 
-<div asp-validation-summary="ModelOnly" class="validation-summary"></div>
-<div class="form-grid">
-    <div>
-        <label asp-for="Code"></label>
-        <input asp-for="Code" placeholder="DOTNET-101" />
-        <span asp-validation-for="Code"></span>
+@* Validation summary *@
+<div asp-validation-summary="ModelOnly"
+     class="px-4 py-3 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-xl text-sm text-red-600 dark:text-red-400 empty:hidden"></div>
+
+@* Section: Identity *@
+<div class="bg-white dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-2xl overflow-hidden">
+    <div class="px-5 py-3.5 border-b border-zinc-100 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/40">
+        <span class="text-[11px] font-semibold tracking-widest uppercase text-zinc-400">Identity</span>
     </div>
-    <div>
-        <label asp-for="Title"></label>
-        <input asp-for="Title" placeholder="Course title" />
-        <span asp-validation-for="Title"></span>
-    </div>
-    <div>
-        <label asp-for="Category"></label>
-        <input asp-for="Category" />
-        <span asp-validation-for="Category"></span>
-    </div>
-    <div>
-        <label asp-for="Level"></label>
-        <input asp-for="Level" />
-        <span asp-validation-for="Level"></span>
-    </div>
-    <div>
-        <label asp-for="AccentColor"></label>
-        <input asp-for="AccentColor" type="color" />
-        <span asp-validation-for="AccentColor"></span>
-    </div>
-    <div>
-        <label asp-for="HeroImageUrl"></label>
-        <input asp-for="HeroImageUrl" placeholder="https://..." />
-        <span asp-validation-for="HeroImageUrl"></span>
+    <div class="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+        @* Code *@
+        <div class="flex flex-col gap-1.5">
+            <label asp-for="Code" class="text-xs font-medium text-zinc-600 dark:text-zinc-400"></label>
+            <input asp-for="Code" placeholder="DOTNET-101"
+                   class="px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" />
+            <span asp-validation-for="Code" class="text-xs text-red-500"></span>
+        </div>
+
+        @* Title *@
+        <div class="flex flex-col gap-1.5">
+            <label asp-for="Title" class="text-xs font-medium text-zinc-600 dark:text-zinc-400"></label>
+            <input asp-for="Title" placeholder="Course title"
+                   class="px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" />
+            <span asp-validation-for="Title" class="text-xs text-red-500"></span>
+        </div>
+
+        @* Category *@
+        <div class="flex flex-col gap-1.5">
+            <label asp-for="Category" class="text-xs font-medium text-zinc-600 dark:text-zinc-400"></label>
+            <input asp-for="Category"
+                   class="px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" />
+            <span asp-validation-for="Category" class="text-xs text-red-500"></span>
+        </div>
+
+        @* Level *@
+        <div class="flex flex-col gap-1.5">
+            <label asp-for="Level" class="text-xs font-medium text-zinc-600 dark:text-zinc-400"></label>
+            <input asp-for="Level"
+                   class="px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" />
+            <span asp-validation-for="Level" class="text-xs text-red-500"></span>
+        </div>
+
+        @* Accent color *@
+        <div class="flex flex-col gap-1.5">
+            <label asp-for="AccentColor" class="text-xs font-medium text-zinc-600 dark:text-zinc-400"></label>
+            <div class="flex items-center gap-2">
+                <input asp-for="AccentColor" type="color"
+                       class="w-10 h-10 p-0.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg cursor-pointer" />
+                <span class="text-xs text-zinc-400">Pick a brand color for this course card</span>
+            </div>
+            <span asp-validation-for="AccentColor" class="text-xs text-red-500"></span>
+        </div>
+
+        @* Hero image URL *@
+        <div class="flex flex-col gap-1.5">
+            <label asp-for="HeroImageUrl" class="text-xs font-medium text-zinc-600 dark:text-zinc-400"></label>
+            <input asp-for="HeroImageUrl" placeholder="https://..."
+                   class="px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" />
+            <span asp-validation-for="HeroImageUrl" class="text-xs text-red-500"></span>
+        </div>
     </div>
 </div>
 
-<label asp-for="Summary"></label>
-<input asp-for="Summary" placeholder="Short catalog summary" />
-<span asp-validation-for="Summary"></span>
+@* Section: Content *@
+<div class="bg-white dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-2xl overflow-hidden">
+    <div class="px-5 py-3.5 border-b border-zinc-100 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/40">
+        <span class="text-[11px] font-semibold tracking-widest uppercase text-zinc-400">Content</span>
+    </div>
+    <div class="p-5 flex flex-col gap-4">
 
-<label asp-for="Description"></label>
-<textarea asp-for="Description" rows="8" placeholder="Detailed course description"></textarea>
-<span asp-validation-for="Description"></span>
+        @* Summary *@
+        <div class="flex flex-col gap-1.5">
+            <label asp-for="Summary" class="text-xs font-medium text-zinc-600 dark:text-zinc-400"></label>
+            <input asp-for="Summary" placeholder="Short catalog summary (shown on course cards)"
+                   class="px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" />
+            <span asp-validation-for="Summary" class="text-xs text-red-500"></span>
+        </div>
 
-<label class="check-line">
-    <input asp-for="IsPublished" />
-    <span>Published</span>
-</label>
+        @* Description *@
+        <div class="flex flex-col gap-1.5">
+            <label asp-for="Description" class="text-xs font-medium text-zinc-600 dark:text-zinc-400"></label>
+            <textarea asp-for="Description" rows="8" placeholder="Detailed course description visible on the course page"
+                      class="px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none transition-all"></textarea>
+            <span asp-validation-for="Description" class="text-xs text-red-500"></span>
+        </div>
+    </div>
+</div>
+
+@* Section: Visibility *@
+<div class="bg-white dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-2xl overflow-hidden">
+    <div class="px-5 py-3.5 border-b border-zinc-100 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/40">
+        <span class="text-[11px] font-semibold tracking-widest uppercase text-zinc-400">Visibility</span>
+    </div>
+    <div class="px-5 py-4">
+        <label class="flex items-center gap-3 cursor-pointer group w-fit">
+            <div class="relative">
+                <input asp-for="IsPublished" type="checkbox" class="peer sr-only" />
+                <div class="w-10 h-6 bg-zinc-200 dark:bg-zinc-700 rounded-full transition-colors peer-checked:bg-primary"></div>
+                <div class="absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
+            </div>
+            <div>
+                <span class="text-sm font-medium text-zinc-800 dark:text-zinc-100">Published</span>
+                <p class="text-xs text-zinc-400 mt-0.5">Students can find and enroll in this course</p>
+            </div>
+        </label>
+    </div>
+</div>

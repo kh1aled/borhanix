@@ -4,41 +4,121 @@
     ViewData["PageTitle"] = "DeepSeek AI assistant";
 }
 
-<section class="ai-shell">
-    <div class="chat-panel">
-        <div class="section-heading with-actions">
-            <div>
-                <span class="badge"><i data-lucide="sparkles"></i>@Model.Model</span>
-                <h2>LMS assistant</h2>
-            </div>
-        </div>
+<div class="flex flex-col h-[629px] bg-[#f9f9f9] dark:bg-[#1e2433]">
 
-        <div class="messages">
-            @if (Model.Messages.Count == 0)
-            {
-                <div class="empty-state compact">
-                    <i data-lucide="messages-square"></i>
-                    <h2>Ask about your LMS work</h2>
-                    <p>Use it for lesson explanations, quiz practice, assignments, grades, attendance, and project planning.</p>
-                </div>
-            }
-            else
-            {
+    @* Messages area *@
+    <div class="flex-1 overflow-y-auto px-4 py-6 flex flex-col gap-3" id="messages-container">
+
+        @if (Model.Messages.Count == 0)
+        {
+            @* Empty state *@
+            <div class="flex flex-col items-center justify-center h-full gap-4">
+                <h2 class="text-2xl font-medium text-zinc-900 dark:text-white tracking-tight">
+                    What's on your mind today?
+                </h2>
+            </div>
+        }
+        else
+        {
+            <div class="flex flex-col gap-3 max-w-2xl mx-auto w-full">
                 @foreach (var message in Model.Messages)
                 {
-                    <article class="message @message.Role">
-                        <span>@message.Role</span>
-                        <p>@message.Content</p>
-                    </article>
+                    @if (message.Role == "user")
+                    {
+                        <div class="self-end max-w-[75%]">
+                            <p class="bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-white text-sm px-4 py-2.5 rounded-[18px] rounded-br-[4px]">
+                                @message.Content
+                            </p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="self-start max-w-[75%]">
+                            <p class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white text-sm px-4 py-2.5 rounded-[18px] rounded-bl-[4px]">
+                                @message.Content
+                            </p>
+                        </div>
+                    }
                 }
-            }
-        </div>
+            </div>
+        }
     </div>
 
-    <form class="prompt-panel" asp-action="Ask" method="post">
-        <input type="hidden" asp-for="ConversationId" />
-        <label asp-for="Prompt">Prompt</label>
-        <textarea asp-for="Prompt" rows="8" placeholder="Explain today's module, generate quiz practice, review my progress, or help plan the project..."></textarea>
-        <button class="button" type="submit"><i data-lucide="send"></i>Ask DeepSeek</button>
-    </form>
-</section>
+    @* Suggestion chips (only when empty) *@
+    @if (Model.Messages.Count == 0)
+    {
+        <div class="flex items-center justify-center gap-2 pb-3 flex-wrap px-4">
+            <span class="flex items-center gap-1.5 px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-full text-sm text-zinc-600 dark:text-zinc-300 bg-white dark:bg-zinc-800 cursor-default">
+                <i data-lucide="image" class="w-4 h-4"></i> Create an image
+            </span>
+            <span class="flex items-center gap-1.5 px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-full text-sm text-zinc-600 dark:text-zinc-300 bg-white dark:bg-zinc-800 cursor-default">
+                <i data-lucide="pencil" class="w-4 h-4"></i> Write or edit
+            </span>
+            <span class="flex items-center gap-1.5 px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-full text-sm text-zinc-600 dark:text-zinc-300 bg-white dark:bg-zinc-800 cursor-default">
+                <i data-lucide="globe" class="w-4 h-4"></i> Look something up
+            </span>
+        </div>
+    }
+
+    @* Prompt bar *@
+    <div class="px-4 pb-6 pt-2">
+        <div class="max-w-3xl mx-auto">
+
+            <form asp-action="Ask" method="post">
+                <input type="hidden" asp-for="ConversationId" />
+
+                <div class="relative ">
+
+                    <textarea asp-for="Prompt"
+                              rows="1"
+                              placeholder="Ask anything..."
+                              class="w-full resize-none border-0
+                    bg-transparent
+                    outline-none
+                    px-5
+                    py-4
+                    pr-16
+                    text-[15px]
+                    leading-6
+                    text-zinc-900
+                    dark:text-white
+                    placeholder:text-zinc-500
+                    min-h-[56px]
+                    max-h-48
+                    overflow-y-auto"
+                              oninput="this.style.height='0';this.style.height=this.scrollHeight+'px'"></textarea>
+
+                    <button type="submit"
+                            class="absolute bottom-3 right-3
+                        h-10 w-10
+                        rounded-full
+                        bg-primary
+                        hover:opacity-90
+                        transition
+                        flex items-center justify-center">
+
+                        <i data-lucide="arrow-up"
+                           class="w-5 h-5 text-white"></i>
+
+                    </button>
+
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-scroll to bottom on load
+        const container = document.getElementById('messages-container');
+        if (container) container.scrollTop = container.scrollHeight;
+        const textarea = document.querySelector("textarea");
+
+        textarea.addEventListener("input", function () {
+            this.style.height = "0";
+            this.style.height = this.scrollHeight + "px";
+        });
+    </script>
+}
