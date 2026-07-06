@@ -1,0 +1,99 @@
+﻿<section class="py-16 bg-white dark:bg-third">
+    <div class="max-w-7xl mx-auto px-8">
+
+        <div class="mb-10">
+            <h2 class="text-3xl font-bold text-[#052c65] mb-2 dark:text-white">Explore Our Courses</h2>
+            <p class="text-muted dark:!text-gray-400">Learn from Industry Experts and Advance Your Career</p>
+        </div>
+
+        <div class="courses-swiper relative">
+
+            <button id="coursesNext" class="swiper-button-next">
+            </button>
+            <button id="coursesPrev" class="swiper-button-prev">
+            </button>
+
+            <div class="swiper">
+                <div class="swiper-wrapper">
+                    @{
+                        var courses = new[]
+                        {
+                            new { Title = "Backend Development With Node.js: Building Scalable Web Apps", Image = "courses-1.jpg", Lectures = 31, Level = "Beginner", Price = "$155", Rating = 4.9, Reviews = "1.57k", InstructorName = "Agnil Marcho", Avatar = "avatar-1.jpg" },
+                            new { Title = "HTML Mastery: Complete Guide To HTML From Basics To Advanced", Image = "courses-2.jpg", Lectures = 32, Level = "Advance", Price = "$149", Rating = 4.9, Reviews = "2.22k", InstructorName = "Cody L.", Avatar = "avatar-3.jpg" },
+                            new { Title = "Python Unleashed: Mastering JavaScript For Web Development", Image = "courses-3.jpg", Lectures = 45, Level = "Advance", Price = "$179", Rating = 4.9, Reviews = "1.34k", InstructorName = "Adam Lobby", Avatar = "avatar-4.jpg" },
+                            new { Title = "Advanced WordPress Techniques: Dive Deep Into Styling And Layout", Image = "courses-4.jpg", Lectures = 65, Level = "Beginner", Price = "$199", Rating = 4.8, Reviews = "4.36k", InstructorName = "Ambus Kornil", Avatar = "avatar-6.jpg" },
+                            new { Title = "React Masterclass: Build Modern Apps From Scratch", Image = "courses-5.jpg", Lectures = 52, Level = "Intermediate", Price = "$180", Rating = 4.7, Reviews = "3.1k", InstructorName = "Sara Lin", Avatar = "avatar-4.jpg" },
+                        };
+                    }
+                    @foreach (var course in courses)
+                    {
+                        <div class="swiper-slide">
+                            <div class="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-[#e8edf7] dark:border-gray-600 shadow-sm hover:shadow-md transition-shadow duration-300">
+                                <div class="relative w-full h-48">
+                                    <img src="~/images/courses/@course.Image" alt="@course.Title" class="w-full h-full object-cover" />
+                                    <button class="absolute top-3 right-3 w-9 h-9 bg-[#0d6efd] rounded-full flex items-center justify-center shadow-md hover:bg-[#0a58ca] transition-colors">
+                                        <i data-lucide="heart" class="w-4 h-4 text-white dark:text-gray-300"></i>
+                                    </button>
+                                </div>
+
+                                <div class="p-4">
+                                    <h3 class="text-[#1e293b] dark:text-white font-semibold text-[15px] leading-snug mb-3 line-clamp-2 min-h-[40px]">@course.Title</h3>
+
+                                    <div class="flex items-center justify-between gap-4 text-[#6c757d] dark:text-gray-400 text-sm mb-1.5">
+                                        <span class="flex items-center gap-1.5"><i data-lucide="book-open" class="w-4 h-4"></i>@course.Lectures Lectures</span>
+                                        <span class="flex items-center gap-1.5"><i data-lucide="bar-chart-2" class="w-4 h-4"></i>@course.Level</span>
+                                    </div>
+
+                                    <div class="flex items-center justify-between gap-4 text-sm mb-4">
+                                        <span class="flex items-center gap-1.5 text-[#6c757d] dark:text-gray-400">
+                                            <i data-lucide="circle-dollar-sign" class="w-4 h-4"></i>
+                                            <span class="font-semibold text-[#1e293b] dark:text-gray-400">@course.Price</span>
+                                        </span>
+                                        <span class="flex items-center gap-1">
+                                            <i data-lucide="star" class="w-4 h-4 text-yellow-400" style="fill:#facc15"></i>
+                                            <span class="font-semibold text-[#1e293b] dark:text-gray-400 text-sm">@course.Rating</span>
+                                            <span class="text-[#6c757d] text-xs">(@course.Reviews)</span>
+                                        </span>
+                                    </div>
+
+                                    <div class="border-t border-[#e8edf7] pt-3 flex items-center justify-between">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-8 h-8 rounded-full overflow-hidden bg-[#e2e8f0] shrink-0">
+                                                <img src="~/images/instructors/@course.Avatar" alt="@course.InstructorName" class="w-full h-full object-cover" />
+                                            </div>
+                                            <span class="text-[#1e293b] dark:text-gray-400 text-sm font-medium truncate max-w-[90px]">@course.InstructorName</span>
+                                        </div>
+
+                                        <a href="#" class="text-[#0d6efd] dark:text-blue-400 dark:text-gray-400 text-sm font-semibold flex items-center gap-1 hover:gap-2 transition-all duration-200 whitespace-nowrap">
+                                            Enrolled Now
+                                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        new Swiper('.courses-swiper .swiper', {
+            spaceBetween: 20,
+            slidesPerView: 4,
+            loop: true,
+            speed: 1000,
+            autoplay: { delay: 3000, disableOnInteraction: false },
+            navigation: { nextEl: '#coursesNext', prevEl: '#coursesPrev' },
+            breakpoints: {
+                320: { slidesPerView: 1 },
+                640: { slidesPerView: 2 },
+                1024: { slidesPerView: 3 },
+                1280: { slidesPerView: 4 },
+            },
+        });
+    });
+</script>

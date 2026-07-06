@@ -1,0 +1,204 @@
+@model ProfileViewModel
+@{
+    ViewData["Title"] = "Profile";
+    ViewData["PageTitle"] = "My Profile";
+
+    <!-- Build initials from full name -->
+    var initials = Model.FullName
+        .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        .Select(x => x[0])
+        .Take(2)
+        .Aggregate("", (a, b) => a + b);
+}
+
+<div class="min-h-screen space-y-6">
+
+    <!-- ===== HERO BANNER ===== -->
+    <div class="relative rounded-2xl overflow-hidden bg-primary dark:bg-primary/20" style="min-height: 180px;">
+
+        <!-- Decorative background SVG (purely visual, no interaction) -->
+        <svg class="absolute inset-0 w-full h-full opacity-20 pointer-events-none"
+             viewBox="0 0 900 200" preserveAspectRatio="xMaxYMid slice"
+             xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- Medal -->
+            <circle cx="680" cy="80" r="46" fill="none" stroke="white" stroke-width="5" />
+            <polygon points="680,57 688,73 706,75 693,88 697,106 680,97 663,106 667,88 654,75 672,73"
+                     fill="none" stroke="white" stroke-width="4" />
+            <line x1="672" y1="34" x2="660" y2="15" stroke="white" stroke-width="5" stroke-linecap="round" />
+            <line x1="688" y1="34" x2="700" y2="15" stroke="white" stroke-width="5" stroke-linecap="round" />
+            <!-- Pencil -->
+            <rect x="760" y="50" width="14" height="90" rx="3" fill="none" stroke="white" stroke-width="4" transform="rotate(-30 767 95)" />
+            <polygon points="770,135 760,155 780,155" fill="none" stroke="white" stroke-width="3" transform="rotate(-30 767 95)" />
+            <!-- Light bulb -->
+            <circle cx="840" cy="80" r="28" fill="none" stroke="white" stroke-width="4" />
+            <line x1="840" y1="108" x2="840" y2="120" stroke="white" stroke-width="4" stroke-linecap="round" />
+            <line x1="831" y1="120" x2="849" y2="120" stroke="white" stroke-width="3" stroke-linecap="round" />
+            <line x1="833" y1="127" x2="847" y2="127" stroke="white" stroke-width="3" stroke-linecap="round" />
+        </svg>
+
+        <!-- Hero content: avatar + name + Edit Profile link -->
+        <div class="relative z-10 flex items-center gap-5 px-6 py-8">
+
+            <!-- Avatar -->
+            <div class="shrink-0">
+                @if (!string.IsNullOrWhiteSpace(Model.ProfilePhotoUrl))
+                {
+                    <img src="@Model.ProfilePhotoUrl"
+                         alt="@Model.FullName"
+                         class="w-20 h-20 rounded-full object-cover ring-4 ring-white/40 shadow-lg" />
+                }
+                else
+                {
+                    <div class="w-20 h-20 rounded-full flex items-center justify-center text-white text-2xl font-bold
+                        ring-4 ring-white/40 shadow-lg"
+                         style="background-color: @Model.AvatarColor">
+                        @initials
+                    </div>
+                }
+            </div>
+
+            <!-- Name, role, approval badge -->
+            <div class="flex-1 min-w-0">
+                <h1 class="text-2xl font-bold text-white tracking-wide">@Model.FullName.ToUpper()</h1>
+                <p class="text-white/80 text-sm mt-0.5">
+                    @(Model.IsStudent ? "Student" : "Instructor")
+                    @if (!string.IsNullOrWhiteSpace(Model.ProgramOrDepartment))
+                    {
+                        <span> · @Model.ProgramOrDepartment</span>
+                    }
+                </p>
+
+                <!-- Approval status badge -->
+                <span class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium
+                    bg-white/20 text-white backdrop-blur-sm">
+                    <span class="w-1.5 h-1.5 rounded-full @(Model.IsApproved ? "bg-emerald-300" : "bg-amber-300")"></span>
+                    @(Model.IsApproved ? "Approved" : "Pending Approval")
+                </span>
+            </div>
+
+            <!-- Edit Profile button (navigates to Edit view) -->
+            <a asp-action="Edit"
+               class="shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-full
+                bg-white/15 hover:bg-white/25 backdrop-blur-sm
+                text-white text-sm font-medium border border-white/30 transition-colors">
+                <i data-lucide="settings" class="w-4 h-4"></i>
+                Edit Profile
+            </a>
+        </div>
+    </div>
+
+
+    <!-- ===== TWO-COLUMN LAYOUT ===== -->
+    <div class="flex flex-col lg:flex-row gap-6">
+
+        <!-- ===== LEFT COLUMN ===== -->
+        <div class="w-full lg:w-96 xl:w-[620px] shrink-0 space-y-6">
+
+            <!-- Profile Info Card -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+
+                <!-- Card header -->
+                <div class="flex items-center gap-3 px-6 py-4 border-b border-gray-100 dark:border-gray-700">
+                    <i data-lucide="user" class="w-4 h-4 text-primary"></i>
+                    <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Profile Information</h2>
+                </div>
+
+                <!-- Read-only info rows -->
+                <div class="divide-y divide-gray-50 dark:divide-gray-700/60">
+
+                    <div class="flex items-center justify-between px-6 py-4">
+                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Profile Name</span>
+                        <span class="text-sm font-semibold text-gray-900 dark:text-white">@Model.FullName</span>
+                    </div>
+
+                    <div class="flex items-center justify-between px-6 py-4">
+                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Email Address</span>
+                        <span class="text-sm text-gray-900 dark:text-white truncate max-w-[220px]">@Model.Email</span>
+                    </div>
+
+                    <div class="flex items-center justify-between px-6 py-4">
+                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Phone Number</span>
+                        <span class="text-sm text-gray-900 dark:text-white">
+                            @(string.IsNullOrWhiteSpace(Model.PhoneNumber) ? "Waiting for update" : Model.PhoneNumber)
+                        </span>
+                    </div>
+
+                    <div class="flex items-center justify-between px-6 py-4">
+                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Program / Dept</span>
+                        <span class="text-sm text-gray-900 dark:text-white">
+                            @(string.IsNullOrWhiteSpace(Model.ProgramOrDepartment) ? "N/A" : Model.ProgramOrDepartment)
+                        </span>
+                    </div>
+
+                    <div class="flex items-center justify-between px-6 py-4">
+                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Level / Title</span>
+                        <span class="text-sm text-gray-900 dark:text-white">
+                            @(string.IsNullOrWhiteSpace(Model.LevelOrTitle) ? "N/A" : Model.LevelOrTitle)
+                        </span>
+                    </div>
+
+                    <div class="flex items-center justify-between px-6 py-4">
+                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Emergency Contact</span>
+                        <span class="text-sm text-gray-900 dark:text-white">
+                            @(string.IsNullOrWhiteSpace(Model.EmergencyContactOrOfficeHours) ? "N/A" : Model.EmergencyContactOrOfficeHours)
+                        </span>
+                    </div>
+
+                </div>
+            </div>
+            <!-- END Profile Info Card -->
+            <!-- Student Card shortcut (students only) -->
+            @if (Model.IsStudent)
+            {
+                <a asp-controller="Attendance" asp-action="StudentCard"
+                   class="flex items-center gap-3 px-5 py-4 rounded-2xl
+                    bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700
+                    hover:border-primary/40 transition-colors group">
+                    <div class="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
+                        <i data-lucide="id-card" class="w-5 h-5 text-primary"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white">Student Card</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">View your QR attendance card</p>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400 group-hover:text-primary transition-colors"></i>
+                </a>
+            }
+
+        </div>
+        <!-- END LEFT COLUMN -->
+        <!-- ===== RIGHT COLUMN ===== -->
+        <div class="flex-1 min-w-0 space-y-6">
+
+            <!-- Bio Card (only shown when bio exists) -->
+            @if (!string.IsNullOrWhiteSpace(Model.Bio))
+            {
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+
+                    <!-- Card header with quick-edit pencil link -->
+                    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="file-text" class="w-4 h-4 text-primary"></i>
+                            <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Bio</h2>
+                        </div>
+                        <!-- Pencil icon links to Edit view -->
+                        <a asp-action="Edit" class="text-gray-400 hover:text-primary transition-colors">
+                            <i data-lucide="pencil" class="w-4 h-4"></i>
+                        </a>
+                    </div>
+
+                    <div class="px-6 py-5">
+                        <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">@Model.Bio</p>
+                    </div>
+                </div>
+            }
+
+
+
+        </div>
+        <!-- END RIGHT COLUMN -->
+
+    </div>
+    <!-- END TWO-COLUMN LAYOUT -->
+
+</div>

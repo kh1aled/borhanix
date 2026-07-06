@@ -1,0 +1,15 @@
+@{
+    ViewData["Title"] = "Payment Complete";
+    ViewData["PageTitle"] = "Payment Complete";
+}
+
+<div class="mx-auto max-w-2xl rounded-2xl border border-slate-100 bg-white p-10 text-center shadow-sm dark:border-slate-800 dark:bg-gray-900">
+    <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300">
+        <i data-lucide="check" class="h-8 w-8"></i>
+    </div>
+    <h1 class="mt-5 text-2xl font-bold text-slate-900 dark:text-white">Sandbox payment complete</h1>
+    <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Your test payment was approved locally and your course enrollments are active.</p>
+    <a asp-controller="Dashboard" asp-action="Index" class="mt-6 inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white transition hover:brightness-110">
+        Go to dashboard
+    </a>
+</div>

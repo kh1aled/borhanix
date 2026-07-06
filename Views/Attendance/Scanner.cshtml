@@ -1,0 +1,153 @@
+@model AttendanceScanViewModel
+@{
+    ViewData["Title"] = "Scanner";
+    ViewData["PageTitle"] = "Student QR scanner";
+}
+
+<div class="mx-auto space-y-6">
+
+    @* Header *@
+    <div>
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-medium mb-2">
+            <i data-lucide="scan-qr-code" class="w-3.5 h-3.5"></i>
+            QR attendance
+        </div>
+        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">
+            @(Model.Session?.Title ?? "Choose a session")
+        </h1>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Scan student ID cards to record attendance</p>
+    </div>
+
+    @* Two-column layout  *@
+    <div class="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-5 items-start">
+
+        @* ── Scanner panel ──  *@
+        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden">
+
+            @* Camera viewport  *@
+            <div id="reader" class="w-full bg-gray-450 aspect-video flex items-center justify-center relative">
+                @* Corner frame overlay  *@
+                <div class="relative w-44 h-44">
+                    @* top-left  *@
+                    <span class="absolute top-0 left-0 w-8 h-8 border-t-[3px] border-l-[3px] border-sky-400 rounded-tl-md"></span>
+                    @* top-right  *@
+                    <span class="absolute top-0 right-0 w-8 h-8 border-t-[3px] border-r-[3px] border-sky-400 rounded-tr-md"></span>
+                    @* bottom-left  *@
+                    <span class="absolute bottom-0 left-0 w-8 h-8 border-b-[3px] border-l-[3px] border-sky-400 rounded-bl-md"></span>
+                    @* bottom-right  *@
+                    <span class="absolute bottom-0 right-0 w-8 h-8 border-b-[3px] border-r-[3px] border-sky-400 rounded-br-md"></span>
+                    @* scan line  *@
+                    <div class="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-sky-400 to-transparent animate-scan-line"></div>
+                </div>
+                <p class="absolute bottom-5 text-slate-400 text-xs tracking-wide">Point camera at student QR code</p>
+            </div>
+
+            @* Status bar  *@
+            <div id="scanner-status" class="flex items-center gap-2.5 px-5 py-3 border-t border-gray-100 dark:border-gray-800">
+                <span id="status-dot" class="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600 flex-shrink-0"></span>
+                <span id="status-text" class="text-xs text-gray-500 dark:text-gray-400">Scanner initialising…</span>
+            </div>
+        </div>
+
+        @* ── Aside panel ──  *@
+        <aside class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl divide-y divide-gray-100 dark:divide-gray-800">
+
+            @* Session selector  *@
+            <div class="px-5 py-4">
+                <form method="get" asp-action="Scanner">
+                    <label class="block text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-2">Session</label>
+                    <select name="sessionId" onchange="this.form.submit()"
+                            class="w-full px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors">
+                        @foreach (var session in Model.AvailableSessions)
+                        {
+                            if (session.Id == Model.SessionId)
+                            {
+                                <option value="@session.Id" selected>@session.Course.Code – @session.Title</option>
+                            }
+                            else
+                            {
+                                <option value="@session.Id">@session.Course.Code – @session.Title</option>
+                            }
+                        }
+                    </select>
+                </form>
+            </div>
+
+            @* Manual payload form  *@
+            <div class="px-5 py-4 space-y-3">
+                <form asp-action="Mark" method="post" id="scanForm">
+                    <input type="hidden" asp-for="SessionId" />
+
+                    <div>
+                        <label asp-for="Payload" class="block text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-2">
+                            Student QR payload
+                        </label>
+                        <textarea asp-for="Payload" id="Payload" rows="4"
+                                  placeholder="Scan or paste the student's QR payload"
+                                  class="w-full px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs font-mono text-gray-800 dark:text-gray-200 placeholder:text-gray-400 placeholder:font-sans placeholder:text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors resize-none"></textarea>
+                    </div>
+
+                    <button type="submit"
+                            class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary/90 transition-colors">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                        Mark attendance
+                    </button>
+                </form>
+            </div>
+
+            @* Recent scans live feed  *@
+            <div class="px-5 py-4">
+                <p class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-3">Recent scans</p>
+                <ul id="recent-scans" class="space-y-0 divide-y divide-gray-50 dark:divide-gray-800/60">
+                    <li class="py-2 text-xs text-gray-400 dark:text-gray-500 italic" id="no-scans-msg">No scans yet — waiting for first scan.</li>
+                </ul>
+            </div>
+
+        </aside>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="~/js/attendance-scanner.js" asp-append-version="true"></script>
+    <script>
+        // Status helpers for attendance-scanner.js to call
+        function setScannerStatus(state, message) {
+        const dot = document.getElementById('status-dot');
+        const text = document.getElementById('status-text');
+        text.textContent = message;
+        dot.className = 'w-2 h-2 rounded-full flex-shrink-0 ' + ({
+        active:   'bg-emerald-400 animate-pulse',
+        idle:     'bg-gray-300 dark:bg-gray-600',
+        success:  'bg-emerald-400',
+        error:    'bg-red-400',
+        warning:  'bg-amber-400'
+        }[state] ?? 'bg-gray-300');
+        }
+
+        // Recent scans feed helper
+        function addRecentScan(name, initials, status, time) {
+        const list = document.getElementById('recent-scans');
+        const noMsg = document.getElementById('no-scans-msg');
+        if (noMsg) noMsg.remove();
+
+        const statusClass = {
+        'Present': 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
+        'Late':    'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+        'Absent':  'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+        }[status] ?? 'bg-gray-100 text-gray-600';
+
+        const li = document.createElement('li');
+        li.className = 'flex items-center gap-3 py-2.5';
+        li.innerHTML = `
+        <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-semibold text-primary flex-shrink-0">${initials}</div>
+        <div class="min-w-0">
+        <p class="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">${name}</p>
+        <p class="text-xs text-gray-400">${time}</p>
+        </div>
+        <span class="ml-auto text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 ${statusClass}">${status}</span>
+        `;
+        list.prepend(li);
+        }
+    </script>
+}

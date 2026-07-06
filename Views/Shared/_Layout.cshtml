@@ -1,0 +1,315 @@
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+
+    ApplicationUser? currentUser = null;
+
+    if (User.Identity?.IsAuthenticated == true)
+    {
+        currentUser = await UserManager.GetUserAsync(User);
+    }
+
+    string NavClass(string controller, string? action = null)
+    {
+        var isActive = currentController == controller && (action == null || currentAction == action);
+        const string baseClasses = "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition";
+
+        return isActive
+            ? $"{baseClasses} bg-primary text-white"
+            : $"{baseClasses} text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white";
+    }
+
+    string HeaderLinkClass(string controller, string action)
+    {
+        var isActive = currentController == controller && currentAction == action;
+        const string baseClasses = "px-4 py-2 rounded-lg border font-medium transition";
+
+        return isActive
+            ? $"{baseClasses} bg-primary border-primary text-white"
+            : $"{baseClasses} border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:bg-primary hover:border-primary hover:text-white";
+    }
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Borhanix</title>
+
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link href="~/css/output.css" rel="stylesheet" asp-append-version="true" />
+    <link rel="icon" href="~/images/borhanix-icon.png" />
+    <script>
+            (function () {
+                const theme = localStorage.getItem("theme");
+
+                if (
+                    theme === "dark" ||
+                    (!theme && window.matchMedia("(prefers-color-scheme: dark)").matches)
+                ) {
+                    document.documentElement.classList.add("dark");
+                } else {
+                    document.documentElement.classList.remove("dark");
+                }
+            })();
+    </script>
+</head>
+
+<body class="bg-slate-50 text-slate-700 dark:bg-gray-900 dark:text-slate-200">
+
+    <!-- Mobile Overlay -->
+    <div id="sidebarOverlay"
+         class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden">
+    </div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar"
+           class="fixed left-0 top-0 z-50 h-screen w-64 border-r border-slate-200 dark:border-gray-600 shadow-sm
+        -translate-x-full transition-transform duration-300 flex flex-col bg-white dark:bg-gray-700">
+
+        <!-- Brand -->
+        <a asp-controller="Home"
+           asp-action="Index"
+           class="flex items-center justify-center h-16 border-b border-slate-200 dark:border-gray-600">
+
+            <img src="~/images/borhanix-logo.png"
+                 alt="Borhanix Logo"
+                 class="h-11 w-auto" />
+
+        </a>
+
+        <!-- Navigation -->
+        <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
+
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <a asp-controller="Dashboard" asp-action="Index" class="@NavClass("Dashboard")">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <a asp-controller="Profile" asp-action="Index" class="@NavClass("Profile")">
+                    <i data-lucide="circle-user-round"></i>
+                    <span>Profile</span>
+                </a>
+
+                <a asp-controller="Courses" asp-action="Index" class="@NavClass("Courses")">
+                    <i data-lucide="book-open"></i>
+                    <span>Courses</span>
+                </a>
+
+                @if (User.IsInRole(AppRoles.Student))
+                {
+                    <a asp-controller="Cart" asp-action="Index" class="@NavClass("Cart")">
+                        <i data-lucide="shopping-cart"></i>
+                        <span>Cart</span>
+                    </a>
+
+                    <a asp-controller="SavedCourses" asp-action="Index" class="@NavClass("SavedCourses")">
+                        <i data-lucide="bookmark"></i>
+                        <span>Saved Courses</span>
+                    </a>
+                }
+
+                <a asp-controller="Attendance" asp-action="Index" class="@NavClass("Attendance")">
+                    <i data-lucide="qr-code"></i>
+                    <span>Attendance</span>
+                </a>
+
+                <a asp-controller="AiAssistant" asp-action="Index" class="@NavClass("AiAssistant")">
+                    <i data-lucide="sparkles"></i>
+                    <span>AI Assistant</span>
+                </a>
+
+                @if (User.IsInRole(AppRoles.Instructor) || User.IsInRole(AppRoles.Admin))
+                {
+                    <a asp-controller="InstructorStudio" asp-action="Index" class="@NavClass("InstructorStudio")">
+                        <i data-lucide="presentation"></i>
+                        <span>Instructor Studio</span>
+                    </a>
+
+                    <a asp-controller="Enrollments" asp-action="Pending" class="@NavClass("Enrollments")">
+                        <i data-lucide="user-check"></i>
+                        <span>Approvals</span>
+                    </a>
+                }
+
+                @if (User.IsInRole(AppRoles.Admin))
+                {
+                    <a asp-controller="Admin" asp-action="Index" class="@NavClass("Admin", "Index")">
+                        <i data-lucide="shield-check"></i>
+                        <span>Admin</span>
+                    </a>
+
+                    <a asp-controller="Admin" asp-action="Users" class="@NavClass("Admin", "Users")">
+                        <i data-lucide="users-round"></i>
+                        <span>Users</span>
+                    </a>
+                }
+            }
+            else
+            {
+                <a asp-controller="Home" asp-action="Index" class="@NavClass("Home")">
+                    <i data-lucide="home"></i>
+                    <span>Overview</span>
+                </a>
+
+                <a asp-controller="Account" asp-action="Login" class="@NavClass("Account", "Login")">
+                    <i data-lucide="log-in"></i>
+                    <span>Login</span>
+                </a>
+
+                <a asp-controller="Account" asp-action="Register" class="@NavClass("Account", "Register")">
+                    <i data-lucide="user-plus"></i>
+                    <span>Register</span>
+                </a>
+            }
+        </nav>
+    </aside>
+
+    <!-- Main -->
+    <main class="min-h-screen">
+
+        <!-- Header -->
+        <header id="main-header" class="sticky top-0 z-30 h-16 border-b border-slate-200 dark:border-gray-600 shadow-sm flex items-center justify-between px-4 lg:px-6 bg-white dark:bg-gray-700 transition-[padding] duration-300">
+
+            <div class="flex items-center gap-3">
+
+                <button id="sidebarToggle"
+                        aria-label="Toggle sidebar"
+                        class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-gray-600 transition cursor-pointer">
+                    <i data-lucide="menu"></i>
+                </button>
+
+                <div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">
+                        @DateTime.Now.ToString("dddd, MMM d")
+                    </p>
+
+                    <h1 class="font-bold text-slate-900 dark:text-white">
+                        @(ViewData["PageTitle"] ?? ViewData["Title"] ?? "Borhanix")
+                    </h1>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+
+                <!-- Theme toggle -->
+                <button type="button"
+                        id="themeToggle"
+                        aria-label="Toggle theme"
+                        class="rounded-md p-2 transition-colors hover:bg-slate-100 dark:hover:bg-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+                    <i data-lucide="moon" id="themeIconMoon" class="size-5 sm:size-6"></i>
+                    <i data-lucide="sun" id="themeIconSun" class="hidden size-5 sm:size-6"></i>
+                </button>
+
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <div class="hidden md:flex items-center gap-3">
+                        @if (string.IsNullOrWhiteSpace(currentUser?.ProfilePhotoUrl))
+                        {
+                            <div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-600 flex items-center justify-center border border-gray-300 dark:border-gray-500">
+                                <i data-lucide="circle-user-round" class="w-6 h-6"></i>
+                            </div>
+                        }
+                        else
+                        {
+                            <img src="@Url.Content(currentUser.ProfilePhotoUrl)"
+                                 class="w-10 h-10 rounded-full object-cover border border-gray-300 dark:border-gray-500"
+                                 alt="@currentUser.FullName" />
+                        }
+                        <div class="leading-tight">
+                            <p class="font-semibold text-slate-900 dark:text-white">
+                                @currentUser?.FullName
+                            </p>
+
+                            <p class="text-xs text-gray-500 dark:text-gray-300">
+                                @currentUser?.Email
+                            </p>
+                        </div>
+                    </div>
+
+                    <form asp-controller="Account" asp-action="Logout" method="post">
+                        <button type="submit"
+                                class="p-2 rounded-lg text-slate-500 hover:bg-red-50 hover:text-red-600 dark:text-slate-400 dark:hover:bg-red-500/10 dark:hover:text-red-400 transition">
+                            <i data-lucide="log-out"></i>
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Login" class="@HeaderLinkClass("Account", "Login")">
+                        Login
+                    </a>
+
+                    <a asp-controller="Account" asp-action="Register" class="@HeaderLinkClass("Account", "Register")">
+                        Register
+                    </a>
+                }
+            </div>
+        </header>
+
+        <!-- Content -->
+        <div id="main" class="md:p-6 transition-[padding] duration-300">
+            <partial name="_Alerts" />
+            @RenderBody()
+        </div>
+
+    </main>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("sidebarOverlay");
+        const toggle = document.getElementById("sidebarToggle");
+        const header = document.getElementById("main-header");
+        const main = document.getElementById("main");
+
+        function isSidebarOpen() {
+        return !sidebar.classList.contains("-translate-x-full");
+        }
+
+        function openSidebar() {
+        sidebar.classList.remove("-translate-x-full");
+        overlay.classList.remove("hidden");
+        header.classList.add("lg:pl-[270px]");
+        main.classList.add("lg:pl-[270px]");
+        }
+
+        function closeSidebar() {
+        sidebar.classList.add("-translate-x-full");
+        overlay.classList.add("hidden");
+        header.classList.remove("lg:pl-[270px]");
+        main.classList.remove("lg:pl-[270px]");
+        }
+
+        toggle?.addEventListener("click", function () {
+        isSidebarOpen() ? closeSidebar() : openSidebar();
+        });
+
+        overlay?.addEventListener("click", closeSidebar);
+
+        document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && isSidebarOpen()) closeSidebar();
+        });
+        sidebar.querySelectorAll("a").forEach(function (link) {
+        link.addEventListener("click", function () {
+        if (window.innerWidth < 1024) closeSidebar();
+        });
+        });
+
+        lucide.createIcons();
+        });
+    </script>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>

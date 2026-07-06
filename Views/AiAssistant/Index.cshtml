@@ -1,0 +1,108 @@
+@model AiAssistantViewModel
+@{
+    ViewData["Title"] = "AI Assistant";
+    ViewData["PageTitle"] = "DeepSeek AI assistant";
+}
+
+<div class="flex flex-col h-[570px] ">
+
+    @* Messages area *@
+    <div class="flex-1 overflow-y-auto px-4 py-6 flex flex-col gap-3" id="messages-container">
+
+        @if (Model.Messages.Count == 0)
+        {
+            @* Empty state *@
+            <div class="flex flex-col items-center justify-center h-full gap-4">
+                <h2 class="text-2xl font-medium text-gray-900 dark:text-white tracking-tight">
+                    What's on your mind today?
+                </h2>
+            </div>
+        }
+        else
+        {
+            <div class="flex flex-col gap-3 max-w-2xl mx-auto w-full">
+                @foreach (var message in Model.Messages)
+                {
+                    @if (message.Role == "user")
+                    {
+                        <div class="self-end max-w-[75%]">
+                            <p class="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white text-sm px-4 py-2.5 rounded-[18px] rounded-br-[4px]">
+                                @message.Content
+                            </p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="self-start max-w-[75%]">
+                            <p class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white text-sm px-4 py-2.5 rounded-[18px] rounded-bl-[4px]">
+                                @message.Content
+                            </p>
+                        </div>
+                    }
+                }
+            </div>
+        }
+    </div>
+
+    @* Prompt bar *@
+    <div class="px-4 pb-6 pt-2">
+        <div class="max-w-3xl mx-auto">
+
+            <form asp-action="Ask" method="post">
+                <input type="hidden" asp-for="ConversationId" />
+
+                <div class="relative ">
+
+                    <textarea asp-for="Prompt"
+                              rows="1"
+                              placeholder="Ask anything..."
+                              class="w-full resize-none border-0
+                    bg-transparent
+                    outline-none
+                    px-5
+                    py-4
+                    pr-16
+                    text-[15px]
+                    leading-6
+                    text-gray-900
+                    dark:text-white
+                    placeholder:text-gray-500
+                    min-h-[56px]
+                    max-h-48
+                    overflow-y-auto"
+                              oninput="this.style.height='0';this.style.height=this.scrollHeight+'px'"></textarea>
+
+                    <button type="submit"
+                            class="absolute bottom-3 right-3
+                        h-10 w-10
+                        rounded-full
+                        bg-primary
+                        hover:opacity-90
+                        transition
+                        flex items-center justify-center">
+
+                        <i data-lucide="arrow-up"
+                           class="w-5 h-5 text-white"></i>
+
+                    </button>
+
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-scroll to bottom on load
+        const container = document.getElementById('messages-container');
+        if (container) container.scrollTop = container.scrollHeight;
+        const textarea = document.querySelector("textarea");
+
+        textarea.addEventListener("input", function () {
+            this.style.height = "0";
+            this.style.height = this.scrollHeight + "px";
+        });
+    </script>
+}

@@ -1,0 +1,118 @@
+@model QuizReviewViewModel
+@{
+    ViewData["Title"] = "Quiz review";
+    ViewData["PageTitle"] = "Quiz review";
+    var percentage = Model.MaxScore > 0 ? Math.Round((Model.Attempt.Score ?? 0) / Model.MaxScore * 100, 1) : 0;
+}
+
+<style>
+        .quiz-review-summary { margin-bottom: 1.5rem; }
+        .quiz-review-list { display: grid; gap: 1rem; }
+        .quiz-review-question {
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 2px solid transparent;
+        }
+        .quiz-review-question.is-correct {
+            background: #ecfdf5;
+            border-color: #22c55e;
+        }
+        .quiz-review-question.is-incorrect {
+            background: #fef2f2;
+            border-color: #ef4444;
+        }
+        .quiz-review-question h3 { margin: 0 0 0.75rem; font-size: 1.05rem; }
+        .quiz-review-options { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.5rem; }
+        .quiz-review-option {
+            padding: 0.65rem 0.85rem;
+            border-radius: 8px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+        }
+        .quiz-review-option.is-selected { font-weight: 600; }
+        .quiz-review-option.is-correct-answer { border-color: #22c55e; background: #f0fdf4; }
+        .quiz-review-option.is-wrong-selected { border-color: #ef4444; background: #fff1f2; }
+        .quiz-review-badge {
+            display: inline-block;
+            padding: 0.2rem 0.55rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+        .quiz-review-badge.correct { background: #22c55e; color: #fff; }
+        .quiz-review-badge.incorrect { background: #ef4444; color: #fff; }
+        .quiz-review-meta { color: #64748b; font-size: 0.875rem; margin-top: 0.75rem; }
+        @@media print {
+            .no-print { display: none !important; }
+        }
+</style>
+
+<section class="course-hero quiz-review-summary" style="--accent:#7c3aed">
+    <div>
+        <span class="badge"><i data-lucide="clipboard-check"></i>Quiz review</span>
+        <h2>@Model.Attempt.Quiz.Title</h2>
+        @if (!Model.IsOwner)
+        {
+            <p>Student: <strong>@Model.Attempt.Student.FullName</strong></p>
+        }
+        <p>Score: <strong>@Model.Attempt.Score / @Model.MaxScore</strong> (@percentage%)</p>
+        @if (Model.Attempt.SubmittedAt is not null)
+        {
+            <div class="course-meta">
+                <span>Submitted @Model.Attempt.SubmittedAt.Value.ToLocalTime().ToString("MMM d, yyyy h:mm tt")</span>
+            </div>
+        }
+    </div>
+    <div class="button-row no-print">
+        <a class="button button-ghost" asp-controller="Courses" asp-action="Details" asp-route-id="@Model.Attempt.Quiz.CourseId">Back to course</a>
+        @if (User.IsInRole(AppRoles.Student))
+        {
+            <a class="button button-ghost" asp-action="History">All quiz results</a>
+        }
+    </div>
+</section>
+
+<section class="quiz-review-list">
+    @foreach (var item in Model.Questions)
+    {
+        <article class="quiz-review-question @(item.IsCorrect ? "is-correct" : "is-incorrect")">
+            <h3>
+                @item.Question.Prompt
+                <span class="quiz-review-badge @(item.IsCorrect ? "correct" : "incorrect")">
+                    @(item.IsCorrect ? "Correct" : "Incorrect")
+                </span>
+            </h3>
+            <ul class="quiz-review-options">
+                @foreach (var option in item.Question.Options)
+                {
+                    var isSelected = item.SelectedOption?.Id == option.Id;
+                    var isCorrectAnswer = option.IsCorrect;
+                    var css = isSelected && isCorrectAnswer ? "is-selected is-correct-answer"
+                        : isSelected ? "is-selected is-wrong-selected"
+                        : isCorrectAnswer && !item.IsCorrect ? "is-correct-answer"
+                        : "";
+                    <li class="quiz-review-option @css">
+                        @option.Text
+                        @if (isSelected)
+                        {
+                            <span class="quiz-review-badge @(item.IsCorrect ? "correct" : "incorrect")">Your answer</span>
+                        }
+                        @if (isCorrectAnswer && !item.IsCorrect)
+                        {
+                            <span class="quiz-review-badge correct">Correct answer</span>
+                        }
+                    </li>
+                }
+            </ul>
+            @if (!item.IsCorrect)
+            {
+                <p class="quiz-review-meta">
+                    You selected: <strong>@(item.SelectedOption?.Text ?? "No answer")</strong>.
+                    Correct answer: <strong>@item.CorrectOption?.Text</strong>.
+                </p>
+            }
+            <p class="quiz-review-meta">@item.Question.Points points</p>
+        </article>
+    }
+</section>

@@ -1,0 +1,101 @@
+@model AttendanceSessionDetailsViewModel
+@{
+    ViewData["Title"] = "Attendance report";
+    ViewData["PageTitle"] = Model.Session.Title;
+    var duration = Model.TotalDuration.TotalMinutes < 1
+        ? "Less than 1 min"
+        : $"{Math.Round(Model.TotalDuration.TotalMinutes)} min";
+}
+
+<section class="section-heading with-actions">
+    <div>
+        <span class="badge"><i data-lucide="clipboard-list"></i> Session report</span>
+        <h2>@Model.Session.Title</h2>
+        <p>@Model.Session.Course.Code - @Model.Session.Course.Title</p>
+    </div>
+    <div class="button-row">
+        @if (Model.Session.ClosesAt > DateTimeOffset.UtcNow)
+        {
+            <a class="button" asp-action="Scanner" asp-route-sessionId="@Model.Session.Id"><i data-lucide="scan-qr-code"></i>Scan students</a>
+        }
+        <a class="button button-ghost" asp-action="Index"><i data-lucide="arrow-left"></i>Back</a>
+    </div>
+</section>
+
+<section class="section-grid four">
+    <article class="stat-card tone-cyan"><i data-lucide="users-round"></i><span>Approved</span><strong>@Model.ApprovedStudentCount</strong><small>Students in course</small></article>
+    <article class="stat-card tone-green"><i data-lucide="check-circle-2"></i><span>Present</span><strong>@Model.PresentCount</strong><small>On-time scans</small></article>
+    <article class="stat-card tone-amber"><i data-lucide="clock"></i><span>Late</span><strong>@Model.LateCount</strong><small>After grace window</small></article>
+    <article class="stat-card tone-violet"><i data-lucide="percent"></i><span>Rate</span><strong>@Model.AttendanceRate%</strong><small>@duration total duration</small></article>
+</section>
+
+<section class="content-grid wide-left">
+    <div>
+        <div class="section-heading">
+            <h2>Students who scanned</h2>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Captured</th>
+                        <th>Source</th>
+                        <th>Device</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var record in Model.Records)
+                    {
+                        <tr>
+                            <td>@record.Student.FullName</td>
+                            <td>@record.Student.Email</td>
+                            <td><span class="status-pill">@record.Status</span></td>
+                            <td>@record.CapturedAt.ToLocalTime().ToString("MMM d, yyyy h:mm tt")</td>
+                            <td>@record.Source</td>
+                            <td>@(string.IsNullOrWhiteSpace(record.DeviceInfo) ? "Unknown" : record.DeviceInfo)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <aside class="activity-panel">
+        <div class="section-heading">
+            <h2>Session info</h2>
+        </div>
+        <div class="activity-item">
+            <span>Code</span>
+            <strong>@Model.Session.SessionCode</strong>
+            <small>@Model.Session.SessionDate.ToLocalTime().ToString("MMM d, yyyy")</small>
+        </div>
+        <div class="activity-item">
+            <span>Window</span>
+            <strong>@Model.Session.OpensAt.ToLocalTime().ToString("h:mm tt") - @Model.Session.ClosesAt.ToLocalTime().ToString("h:mm tt")</strong>
+            <small>Total duration: @duration</small>
+        </div>
+        <div class="activity-item">
+            <span>Missing</span>
+            <strong>@Model.MissingCount students</strong>
+            <small>Approved but not scanned</small>
+        </div>
+
+        @if (Model.MissingStudents.Count > 0)
+        {
+            <div class="section-heading">
+                <h2>Not scanned</h2>
+            </div>
+            @foreach (var student in Model.MissingStudents.Take(8))
+            {
+                <div class="activity-item">
+                    <span>Missing</span>
+                    <strong>@student.FullName</strong>
+                    <small>@student.Email</small>
+                </div>
+            }
+        }
+    </aside>
+</section>

@@ -1,0 +1,154 @@
+﻿@{
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+}
+
+<header class="fixed fixed top-0 z-50 w-full bg-white text-third shadow-lg shadow-lg shadow-black/10 shadow-black/10 backdrop-blur-md dark:bg-third dark:text-white dark:shadow-none dark:shadow-none">
+    <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="flex h-16 items-center justify-between sm:h-20">
+
+            <!-- Logo -->
+            <a asp-controller="Home" asp-action="Index" class="flex shrink-0 items-center">
+                <img src="~/images/borhanix-logo.png" alt="Borhanix Logo" class="h-10 w-auto" />
+            </a>
+
+            <!-- Desktop nav links -->
+            <nav class="hidden sm:flex sm:items-center sm:gap-1">
+
+                <a asp-controller="Home"
+                   asp-action="Index"
+                   class="rounded-md px-3 py-2 text-sm font-medium transition-all duration-300 sm:text-base
+                    @(currentAction == "Index"
+                        ? "text-primary bg-primary/10"
+                        : "text-foreground hover:text-primary hover:animate-scale-animation")">
+                    Home
+                </a>
+                <a asp-controller="Home"
+                   asp-action="Courses"
+                   class="rounded-md px-3 py-2 text-sm font-medium transition-all duration-300 sm:text-base
+                    @(currentAction == "Courses"
+                       ? "text-primary bg-primary/10"
+                       : "text-foreground hover:text-primary hover:animate-scale-animation")">
+                    Courses
+                </a>
+                <a asp-controller="Home"
+                   asp-action="Instructors"
+                   class="rounded-md px-3 py-2 text-sm font-medium transition-all duration-300 sm:text-base
+                    @(currentAction == "Instructors"
+                      ? "text-primary bg-primary/10"
+                      : "text-foreground hover:text-primary hover:animate-scale-animation")">
+                    Instructors
+                </a>
+            </nav>
+
+             
+
+
+            <!-- Right side controls -->
+            <div class="flex items-center gap-2 sm:gap-4">
+
+                <!-- Theme toggle -->
+                <button type="button"
+                        id="themeToggle"
+                        aria-label="Toggle theme"
+                        class="cursor-pointer rounded-md p-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+                    <i data-lucide="moon" id="themeIconMoon" class="size-5 sm:size-6"></i>
+                    <i data-lucide="sun" id="themeIconSun" class="hidden size-5 sm:size-6"></i>
+                </button>
+
+
+                <!-- Auth buttons (desktop only) -->
+                <div class="hidden items-center gap-2 sm:flex">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        @if (User.IsInRole(AppRoles.Student))
+                        {
+                            <a asp-controller="Cart" asp-action="Index"
+                               class="rounded-md px-3 py-2 text-sm font-bold text-foreground transition-colors hover:text-primary sm:text-base">
+                                Cart
+                            </a>
+                            <a asp-controller="SavedCourses" asp-action="Index"
+                               class="rounded-md px-3 py-2 text-sm font-bold text-foreground transition-colors hover:text-primary sm:text-base">
+                                Saved
+                            </a>
+                        }
+                        <a asp-controller="Dashboard" asp-action="Index"
+                           class="rounded-md border-2 border-primary px-4 py-2 text-sm font-bold text-foreground transition-colors hover:text-primary-foreground hover:bg-primary sm:px-6 sm:py-2.5 sm:text-base">
+                            Dashboard
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Login"
+                           class="px-3 py-2 text-sm font-bold text-foreground transition-colors hover:text-primary sm:text-base">
+                            Log in
+                        </a>
+                        <a asp-controller="Account" asp-action="Register"
+                           class="rounded-md px-4 py-2 text-sm font-bold text-foreground transition-colors hover:bg-primary hover:text-white sm:px-6 sm:py-2.5 sm:text-base">
+                            Sign up
+                        </a>
+                    }
+                </div>
+
+                <!-- Mobile menu button -->
+                <button type="button"
+                        id="mobileMenuButton"
+                        aria-label="Open main menu"
+                        aria-expanded="false"
+                        class="group relative inline-flex items-center justify-center rounded-md p-2 text-foreground transition-colors hover:bg-foreground/5 hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:hidden">
+                    <i data-lucide="menu" id="menuIconOpen" class="size-6"></i>
+                    <i data-lucide="x" id="menuIconClose" class="hidden size-6"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile menu panel -->
+    <div id="mobileMenuPanel" class="border-border/60 hidden border-t sm:hidden">
+        <div class="space-y-1 px-4 pt-3 pb-4">
+            <a asp-controller="Home" asp-action="Index"
+               class="block rounded-md px-3 py-2 text-base font-medium text-primary transition-colors">
+                Home
+            </a>
+            <a asp-controller="Courses" asp-action="Index"
+               class="block rounded-md px-3 py-2 text-base font-medium text-foreground transition-colors hover:text-primary">
+                Courses
+            </a>
+            <a asp-controller="Instructors" asp-action="Index"
+               class="block rounded-md px-3 py-2 text-base font-medium text-foreground transition-colors hover:text-primary">
+                Instructors
+            </a>
+        </div>
+
+        <div class="border-border/60 flex items-center gap-3 border-t px-4 py-4">
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                @if (User.IsInRole(AppRoles.Student))
+                {
+                    <a asp-controller="Cart" asp-action="Index"
+                       class="flex-1 rounded-md px-4 py-2.5 text-center text-base font-bold text-foreground transition-colors hover:text-primary">
+                        Cart
+                    </a>
+                    <a asp-controller="SavedCourses" asp-action="Index"
+                       class="flex-1 rounded-md px-4 py-2.5 text-center text-base font-bold text-foreground transition-colors hover:text-primary">
+                        Saved
+                    </a>
+                }
+                <a asp-controller="Dashboard" asp-action="Index"
+                   class="flex-1 rounded-md border-2 border-primary px-4 py-2.5 text-center text-base font-bold text-foreground transition-colors hover:text-primary-foreground hover:bg-primary">
+                    Dashboard
+                </a>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Login"
+                   class="flex-1 rounded-md px-4 py-2.5 text-center text-base font-bold text-foreground transition-colors hover:text-primary">
+                    Log in
+                </a>
+                <a asp-controller="Account" asp-action="Register"
+                   class="flex-1 rounded-md border-2 border-primary px-4 py-2.5 text-center text-base font-bold text-foreground transition-colors hover:text-primary-foreground hover:bg-primary">
+                    Sign up
+                </a>
+            }
+        </div>
+    </div>
+</header>

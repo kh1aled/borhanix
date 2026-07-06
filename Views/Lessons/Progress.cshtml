@@ -1,0 +1,53 @@
+@model LessonProgressDashboardViewModel
+@{
+    ViewData["Title"] = "Lesson progress";
+    ViewData["PageTitle"] = Model.Course.Code;
+}
+
+<section class="section-heading with-actions">
+    <div>
+        <span class="badge"><i data-lucide="bar-chart-3"></i> @Model.Course.Code</span>
+        <h2>Student lesson progress</h2>
+    </div>
+    <a class="button button-ghost" asp-controller="Courses" asp-action="Details" asp-route-id="@Model.Course.Id">Back to course</a>
+</section>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>Student</th>
+                @foreach (var lesson in Model.Lessons)
+                {
+                    <th>@lesson.Title</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var student in Model.Students)
+            {
+                <tr>
+                    <td>@student.FullName</td>
+                    @foreach (var lesson in Model.Lessons)
+                    {
+                        Model.Progress.TryGetValue((lesson.Id, student.Id), out var info);
+                        <td>
+                            @if (info is null)
+                            {
+                                <span>0%</span>
+                            }
+                            else if (info.IsComplete)
+                            {
+                                <span class="status-pill">Complete (@info.ViewingPercent%)</span>
+                            }
+                            else
+                            {
+                                <span>@info.ViewingPercent%</span>
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,155 @@
+@model AdminUsersViewModel
+@{
+    ViewData["Title"] = "Users";
+    ViewData["PageTitle"] = "User control";
+}
+
+@* Page header *@
+<div class="flex items-center justify-between gap-4 flex-wrap mb-6">
+    <div>
+        <div class="flex items-center gap-1.5 text-[11px] font-semibold tracking-widest uppercase text-primary mb-1.5">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+            Admin only
+        </div>
+        <h1 class="text-[22px] font-semibold text-gray-900 dark:text-white tracking-tight">User control</h1>
+        <p class="text-sm text-gray-500 mt-0.5">Approve, edit roles, and manage platform accounts.</p>
+    </div>
+    <a asp-controller="Admin" asp-action="Index"
+       class="inline-flex items-center gap-1.5 px-4 py-2.5 border border-gray-200 dark:border-gray-600 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        Back to dashboard
+    </a>
+</div>
+
+@* User list *@
+<div class="flex flex-col gap-4">
+    @foreach (var user in Model.Users)
+    {
+        <article class="bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden">
+
+            @* Card top: avatar + identity + status badge *@
+            <div class="flex items-center gap-4 px-5 py-4 border-b border-gray-100 dark:border-gray-700">
+
+                @* Initials avatar *@
+                <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <span class="text-sm font-semibold text-primary">
+                        @(user.FullName.Split(' ').FirstOrDefault()?[0])@(user.FullName.Split(' ').Skip(1).FirstOrDefault()?[0])
+                    </span>
+                </div>
+
+                @* Name + email *@
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold text-gray-900 dark:text-white truncate">@user.FullName</p>
+                    <p class="text-xs text-gray-500 truncate">@user.Email</p>
+                </div>
+
+                @* Role chip *@
+                <span class="hidden sm:inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold
+                    bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 tracking-wide">
+                    @string.Join(", ", user.Roles)
+                </span>
+
+                @* Approval status pill *@
+                @if (user.IsApproved)
+                {
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400">
+                        <i data-lucide="check" class="w-3 h-3"></i>
+                        Approved
+                    </span>
+                }
+                else
+                {
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400">
+                        <i data-lucide="clock" class="w-3 h-3"></i>
+                        Pending
+                    </span>
+                }
+            </div>
+
+            @* Card body: edit form *@
+            <form asp-action="UpdateUser" method="post"
+                  class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 px-5 py-4 border-b border-gray-100 dark:border-gray-700">
+                <input type="hidden" name="Id" value="@user.Id" />
+
+                @* Full name *@
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[11px] font-semibold tracking-widest uppercase text-gray-400">Name</label>
+                    <input name="FullName" value="@user.FullName"
+                           class="px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" />
+                </div>
+
+                @* Email *@
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[11px] font-semibold tracking-widest uppercase text-gray-400">Email</label>
+                    <input name="Email" value="@user.Email"
+                           class="px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" />
+                </div>
+
+                @* Role select *@
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[11px] font-semibold tracking-widest uppercase text-gray-400">Role</label>
+                    <select name="Role"
+                            class="px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all">
+                        <option value="@AppRoles.Student" selected="@(user.Roles.Contains(AppRoles.Student) ? "selected" : null)">Student</option>
+                        <option value="@AppRoles.Instructor" selected="@(user.Roles.Contains(AppRoles.Instructor) ? "selected" : null)">Instructor</option>
+                        <option value="@AppRoles.Admin" selected="@(user.Roles.Contains(AppRoles.Admin) ? "selected" : null)">Admin</option>
+                    </select>
+                </div>
+
+                @* Approved toggle + save *@
+                <div class="flex flex-col gap-3 justify-end">
+
+                    @* Toggle switch for IsApproved *@
+                    <label class="flex items-center gap-2.5 cursor-pointer w-fit">
+                        <div class="relative">
+                            <input name="IsApproved" type="checkbox" value="true" class="peer sr-only"
+                            @(user.IsApproved ? "checked" : "") />
+                            <input name="IsApproved" type="hidden" value="false" />
+                            <div class="w-9 h-5 bg-gray-200 dark:bg-gray-700 rounded-full transition-colors peer-checked:bg-primary"></div>
+                            <div class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
+                        </div>
+                        <span class="text-sm text-gray-600 dark:text-gray-300">Approved</span>
+                    </label>
+
+                    @* Save button *@
+                    <button type="submit"
+                            class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity w-fit">
+                        <i data-lucide="save" class="w-4 h-4"></i>
+                        Save
+                    </button>
+                </div>
+            </form>
+
+            @* Card footer: quick-approve + delete *@
+            <div class="flex items-center gap-2 px-5 py-3 bg-gray-50 dark:bg-gray-900/40">
+                @if (!user.IsApproved)
+                {
+                    @* One-click approve shortcut *@
+                    <form asp-action="ApproveUser" method="post">
+                        <input type="hidden" name="id" value="@user.Id" />
+                        <button type="submit"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white rounded-lg text-xs font-medium hover:opacity-90 transition-opacity">
+                            <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                            Quick approve
+                        </button>
+                    </form>
+                }
+
+                @* Spacer *@
+                <div class="flex-1"></div>
+
+                @* Delete — danger action pushed to the far right *@
+                <form asp-action="DeleteUser" method="post"
+                      onsubmit="return confirm('Delete this user?');">
+                    <input type="hidden" name="id" value="@user.Id" />
+                    <button type="submit"
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 rounded-lg text-xs font-medium hover:bg-red-50 dark:hover:bg-red-950 transition-colors">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        Delete
+                    </button>
+                </form>
+            </div>
+
+        </article>
+    }
+</div>

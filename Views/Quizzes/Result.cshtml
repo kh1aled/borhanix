@@ -1,0 +1,53 @@
+@model QuizResultViewModel
+@{
+    ViewData["Title"] = "Quiz result";
+    ViewData["PageTitle"] = "Quiz result";
+    var percentage = Model.MaxScore > 0 ? Math.Round((Model.Attempt.Score ?? 0) / Model.MaxScore * 100, 1) : 0;
+}
+
+<section class="course-hero" style="--accent:#7c3aed">
+    <div>
+        <span class="badge"><i data-lucide="badge-check"></i>Completed</span>
+        <h2>@Model.Attempt.Quiz.Title</h2>
+        <p>Score: @Model.Attempt.Score / @Model.MaxScore (@percentage%)</p>
+        @if (Model.Attempt.SubmittedAt is not null)
+        {
+            <div class="course-meta">
+                <span>Submitted @Model.Attempt.SubmittedAt.Value.ToLocalTime().ToString("MMM d, yyyy h:mm tt")</span>
+            </div>
+        }
+    </div>
+    <a class="button button-ghost" asp-controller="Courses" asp-action="Details" asp-route-id="@Model.Attempt.Quiz.CourseId">Back to course</a>
+</section>
+
+@if (Model.CanReview)
+{
+    <section class="question-list">
+        @foreach (var question in Model.Attempt.Quiz.Questions.OrderBy(x => x.SortOrder))
+        {
+            var answer = Model.Attempt.Answers.FirstOrDefault(x => x.QuizQuestionId == question.Id);
+            var selected = question.Options.FirstOrDefault(x => x.Id == answer?.QuizOptionId);
+            var correct = question.Options.FirstOrDefault(x => x.IsCorrect);
+            <article class="question-card @(answer?.IsCorrect == true ? "correct" : "incorrect")">
+                <h3>@question.Prompt</h3>
+                <p>
+                    Your answer: @(selected?.Text ?? "No answer")
+                    @if (answer?.IsCorrect == true)
+                    {
+                        <span class="status-pill">Correct</span>
+                    }
+                    else
+                    {
+                        <span class="status-pill">Incorrect — correct: @correct?.Text</span>
+                    }
+                </p>
+                <small>@question.Points points</small>
+            </article>
+        }
+    </section>
+}
+
+@if (User.IsInRole(AppRoles.Student))
+{
+    <a class="button button-ghost" asp-action="History">All quiz results</a>
+}

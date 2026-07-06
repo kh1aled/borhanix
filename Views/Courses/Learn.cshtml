@@ -1,0 +1,425 @@
+﻿@model CourseDetailsViewModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@{
+    ViewData["Title"] = Model.Course.Title;
+    ViewData["PageTitle"] = Model.Course.Code;
+    var totalLessons = Model.Course.Modules.Sum(x => x.Lessons.Count);
+    var approvedStudents = Model.Course.Enrollments.Count(x => x.Status == EnrollmentStatus.Approved);
+    var coverImage = CourseMedia.ResolveCoverImage(Model.Course);
+    var tokens = Antiforgery.GetAndStoreTokens(Context);
+    var trackProgress = User.IsInRole(AppRoles.Student) && Model.Enrollment?.Status == EnrollmentStatus.Approved;
+}
+
+@* ── Hero Banner ─────────────────────────────────────────────────────── *@
+<div class="relative overflow-hidden bg-slate-100 dark:bg-slate-800 px-4 pb-10 pt-6 lg:px-10" style="--accent:@Model.Course.AccentColor">
+
+    @* Faint watermark icon *@
+    <div class="pointer-events-none absolute -left-6 top-1/2 -translate-y-1/2 opacity-[0.07] dark:opacity-[0.04]">
+        <i data-lucide="graduation-cap" class="h-64 w-64 text-primary"></i>
+    </div>
+
+    <div class="relative mx-auto max-w-screen-xl">
+
+        @* Breadcrumb *@
+        <nav class="mb-4 flex items-center gap-1 text-sm">
+            <a href="/" class="text-slate-500 hover:text-primary dark:text-slate-400 transition">Home</a>
+            <i data-lucide="chevron-right" class="h-4 w-4 text-slate-400"></i>
+            <a asp-controller="Courses" asp-action="Details" asp-route-id="@Model.Course.Id" class="text-slate-500 hover:text-primary dark:text-slate-400 transition">@Model.Course.Title</a>
+            <i data-lucide="chevron-right" class="h-4 w-4 text-slate-400"></i>
+            <span class="font-medium text-primary">Learn</span>
+        </nav>
+
+        <div class="flex flex-col gap-8 lg:flex-row lg:items-start">
+            <div class="flex-1">
+                <h2 id="current-lesson-header" class="mt-3 text-2xl font-extrabold tracking-tight text-slate-800 dark:text-white lg:text-3xl">
+                    @Model.Course.Title
+                </h2>
+
+                @if (Model.CompletionStatus is not null)
+                {
+                    <div class="mt-4 flex flex-wrap items-center gap-3">
+                        <span class="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm dark:bg-slate-900 dark:text-slate-200">
+                            <i data-lucide="check-circle-2" class="h-3.5 w-3.5 text-green-500"></i>
+                            Lessons: <span id="overall-progress-text">@Model.CompletionStatus.CompletedLessons</span> / @Model.CompletionStatus.TotalLessons
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm dark:bg-slate-900 dark:text-slate-200">
+                            <i data-lucide="help-circle" class="h-3.5 w-3.5 text-violet-500"></i>
+                            Quizzes passed: @Model.CompletionStatus.PassedQuizzes / @Model.CompletionStatus.TotalQuizzes
+                        </span>
+                    </div>
+                }
+
+                <div class="mt-6 flex flex-wrap gap-3">
+                    @if (Model.CanGenerateCertificate)
+                    {
+                        <form asp-controller="Certificates" asp-action="Generate" method="post">
+                            <input type="hidden" name="courseId" value="@Model.Course.Id" />
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white transition hover:brightness-110">
+                                <i data-lucide="award" class="h-4 w-4"></i> Generate certificate
+                            </button>
+                        </form>
+                    }
+                    else if (Model.CertificateId is not null)
+                    {
+                        <a asp-controller="Certificates" asp-action="Show" asp-route-id="@Model.CertificateId"
+                           class="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white transition hover:brightness-110">
+                            <i data-lucide="award" class="h-4 w-4"></i> View certificate
+                        </a>
+                    }
+
+                    @if (Model.CanManage)
+                    {
+                        <a asp-controller="Lessons" asp-action="Progress" asp-route-courseId="@Model.Course.Id"
+                           class="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800">
+                            <i data-lucide="bar-chart-3" class="h-4 w-4"></i> Lesson progress
+                        </a>
+                        <a asp-controller="InstructorStudio" asp-action="Index"
+                           class="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800">
+                            <i data-lucide="settings" class="h-4 w-4"></i> Manage
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* ── Main Content ─────────────────────────────────────────────────────── *@
+<div class="px-4 lg:px-10 mt-8 justify-between flex flex-col lg:flex-row gap-5 lg:gap-10">
+    <div class="w-full lg:flex-1">
+
+        @* Player pane: JS clones the active lesson's <template> content in here.
+           This preserves the exact old per-kind rendering (video / iframe / external link / plain content)
+           instead of blindly pushing every URL into one iframe. *@
+        <div id="lesson-player-container"
+             class="aspect-video rounded-xl mb-5 w-full relative bg-black overflow-hidden shadow-md flex items-center justify-center">
+            <p class="text-slate-400 text-sm">Select a lesson to begin</p>
+        </div>
+
+        @* ── Assessments (restored from old view) ───────────────────── *@
+        @if (Model.Course.Assignments.Any() || Model.Course.Quizzes.Any())
+        {
+            <div class="mt-8">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-3">Assessments</h3>
+                <div class="grid gap-3 sm:grid-cols-2">
+                    @foreach (var assignment in Model.Course.Assignments.OrderBy(x => x.DueAt))
+                    {
+                        <div class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm">
+                            <span class="inline-flex items-center gap-1 text-xs font-semibold text-primary uppercase tracking-wide">
+                                <i data-lucide="file-text" class="h-3.5 w-3.5"></i> Assignment
+                            </span>
+                            <p class="mt-1 font-semibold text-slate-800 dark:text-white">@assignment.Title</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">@assignment.MaxPoints points · @assignment.DeadlineHours h personal window</p>
+                            <a asp-controller="Assignments" asp-action="Details" asp-route-id="@assignment.Id"
+                               class="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">
+                                Open assignment <i data-lucide="arrow-right" class="h-3.5 w-3.5"></i>
+                            </a>
+                        </div>
+                    }
+                    @foreach (var quiz in Model.Course.Quizzes)
+                    {
+                        var completed = Model.QuizAttemptIds.TryGetValue(quiz.Id, out var attemptId);
+                        <div class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm">
+                            <span class="inline-flex items-center gap-1 text-xs font-semibold text-violet-500 uppercase tracking-wide">
+                                <i data-lucide="help-circle" class="h-3.5 w-3.5"></i> Quiz
+                            </span>
+                            <p class="mt-1 font-semibold text-slate-800 dark:text-white">@quiz.Title</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">@quiz.Questions.Count questions · @quiz.TimeLimitMinutes min</p>
+                            @if (completed)
+                            {
+                                <a asp-controller="Quizzes" asp-action="Review" asp-route-id="@attemptId"
+                                   class="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">
+                                    Review quiz <i data-lucide="arrow-right" class="h-3.5 w-3.5"></i>
+                                </a>
+                            }
+                            else
+                            {
+                                <a asp-controller="Quizzes" asp-action="Take" asp-route-id="@quiz.Id"
+                                   class="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">
+                                    Open quiz <i data-lucide="arrow-right" class="h-3.5 w-3.5"></i>
+                                </a>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="w-full lg:max-w-[360px] flex-shrink-0">
+        <div class="sticky top-28 lg:-translate-y-12 lg:z-[49] w-full rounded-lg p-4 bg-white dark:bg-gray-800 dark:text-white shadow shadow-[#F3EBE1] dark:shadow-none flex flex-col">
+            <div class="flex-shrink-0">
+                <div class="flex justify-between items-center">
+                    <p class="mb-4 text-lg font-bold">Course List</p>
+                </div>
+                <div class="px-3 mb-4">
+                    <div dir="rtl" class="flex flex-col items-center space-y-4 h-20 justify-center">
+                        <div class="relative w-full dir-rtl">
+                            <div class="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div id="progress-bar-fill" style="width: 0%;" class="h-1.5 bg-gradient-to-l from-[#222D5D] to-[#59B2E4] rounded-full soft transition-all duration-500"></div>
+                            </div>
+                            <div id="progress-bubble" style="right: 0%; transform: translateX(50%);" class="absolute -top-13 soft flex flex-col items-center transition-all duration-500">
+                                <div class="flex justify-center items-center w-8 h-8 text-xs relative rounded-full border-2 border-gray-300 dark:border-gray-500 dark:text-white soft center font-normal text-gray-600 animate-pulse bg-white dark:bg-gray-800">
+                                    <div class="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent border-t-gray-300 dark:border-t-gray-500 -mt-1 absolute -bottom-3"></div>
+                                    You
+                                </div>
+                                <div id="progress-percentage-text" class="mt-1 text-xs font-normal text-primary dark:text-white">
+                                    0%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex-grow overflow-y-auto max-h-[450px] hide-scrollbar mt-2 space-y-3">
+                @foreach (var module in Model.Course.Modules.OrderBy(x => x.SortOrder))
+                {
+                    <div class="module-group">
+                        <button class="module-toggle w-full px-4 py-3 bg-[#e2e1f3] dark:bg-gray-700 rounded-xl flex justify-between items-center cursor-pointer transition hover:brightness-95">
+                            <div class="me-2 flex-shrink-0">
+                                <i class="arrow-icon transition-transform duration-200" data-lucide="chevron-down"></i>
+                            </div>
+                            <div class="flex items-center justify-between gap-2 w-full">
+                                <span class="text-xs font-normal text-primary dark:text-gray-100 text-nowrap">@module.Lessons.Sum(x => x.DurationMinutes) M</span>
+                                <span dir="ltr" class="dark:text-white text-end text-primary text-base font-light">- @module.Title</span>
+                            </div>
+                        </button>
+
+                        <div class="module-content overflow-hidden transition-all duration-300 max-h-0">
+                            <div class="py-2 space-y-1">
+                                @foreach (var lesson in module.Lessons.OrderBy(x => x.SortOrder))
+                                {
+                                    Model.LessonProgressMap.TryGetValue(lesson.Id, out var progress);
+                                    var lessonComplete = progress?.IsComplete == true || Model.CompletedLessonIds.Contains(lesson.Id);
+                                    var video = CourseMedia.ResolveLessonVideo(lesson.VideoUrl);
+                                    var durationSeconds = lesson.VideoDurationSeconds ?? (lesson.DurationMinutes * 60);
+                                    var initialMax = progress?.MaxWatchedSeconds ?? 0;
+                                    var viewingPercent = progress?.ViewingPercent ?? 0;
+                                    <div class="lesson-item-row relative p-3 flex items-center justify-between cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-600 text-gray-500 rounded-md transition group border-l-4 border-transparent"
+                                         dir="ltr"
+                                         data-lesson-id="@lesson.Id"
+                                         data-title="@lesson.Title"
+                                         data-complete="@(lessonComplete ? "true" : "false")">
+
+                                        <div class="flex items-center space-x-3 flex-1 min-w-0">
+                                            <div class="lesson-status-icon-holder w-4 h-4 flex-shrink-0">
+                                                @if (lessonComplete)
+                                                {
+                                                    <i class="w-4 h-4 text-green-500" data-lucide="check-circle-2"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="w-4 h-4 text-gray-400 group-hover:text-primary" data-lucide="circle"></i>
+                                                }
+                                            </div>
+                                            <span class="lesson-title text-sm line-clamp-1 font-normal text-slate-700 dark:text-slate-200">@lesson.Title</span>
+                                        </div>
+                                        <div class="flex items-center text-xs flex-shrink-0 ml-3 text-slate-400">
+                                            <span>@lesson.DurationMinutes M</span>
+                                        </div>
+
+                                        @if (trackProgress && !lessonComplete)
+                                        {
+                                            <div dir="rtl" class="absolute w-full flex flex-col items-center space-y-4 h-full justify-end left-0 bottom-0">
+                                                <div class="w-full dir-rtl flex items-end">
+                                                    <div class="w-full h-1.5 bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                                                        <div id="progress-bar-fill" data-progress-bar="@lesson.Id" style="width:@viewingPercent%" class="h-1.5 bg-gradient-to-l from-[#222D5D] to-[#59B2E4] soft transition-all duration-500"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+
+                                        @* ── Hidden per-lesson player markup, same branching as the old CourseDetails.cshtml ── *@
+                                        <template data-lesson-player="@lesson.Id">
+                                            @if (video.Kind == LessonVideoKind.Direct)
+                                            {
+                                                <video controls preload="metadata" class="w-full h-full"
+                                                       src="@video.PlaybackUrl"
+                                                       data-course-id="@Model.Course.Id"
+                                                       data-lesson-id="@lesson.Id"
+                                                       data-duration-seconds="@durationSeconds"
+                                                       data-initial-max="@initialMax"
+                                                       data-tracking="@(trackProgress && !lessonComplete ? "on" : "off")"></video>
+                                            }
+                                            else if (video.Kind == LessonVideoKind.Embed)
+                                            {
+                                                <div class="lesson-video-frame w-full h-full"
+                                                     data-content-tracker="@(trackProgress && !lessonComplete ? "on" : null)"
+                                                     data-course-id="@(trackProgress && !lessonComplete ? Model.Course.Id : null)"
+                                                     data-lesson-id="@(trackProgress && !lessonComplete ? lesson.Id : null)"
+                                                     data-duration-seconds="@(trackProgress && !lessonComplete ? durationSeconds : null)"
+                                                     data-initial-max="@(trackProgress && !lessonComplete ? initialMax : null)">
+                                                    <iframe src="@video.PlaybackUrl"
+                                                            title="@lesson.Title video"
+                                                            class="w-full h-full"
+                                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                                            allowfullscreen></iframe>
+                                                </div>
+                                            }
+                                            else if (video.Kind == LessonVideoKind.ExternalLink)
+                                            {
+                                                <div class="flex flex-col items-center justify-center gap-4 h-full w-full bg-slate-50 dark:bg-slate-900 rounded-xl p-8 text-center">
+                                                    <i data-lucide="external-link" class="h-10 w-10 text-primary"></i>
+                                                    <p class="text-slate-600 dark:text-slate-300 text-sm">This lesson's video is hosted externally.</p>
+                                                    <a class="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white transition hover:brightness-110"
+                                                       href="@video.PlaybackUrl" target="_blank" rel="noopener">
+                                                        <i data-lucide="external-link" class="h-4 w-4"></i> Open video
+                                                    </a>
+                                                    @if (trackProgress && !lessonComplete)
+                                                    {
+                                                        <div class="lesson-content-tracker w-full text-left text-sm text-slate-500 dark:text-slate-400"
+                                                             data-content-tracker
+                                                             data-course-id="@Model.Course.Id"
+                                                             data-lesson-id="@lesson.Id"
+                                                             data-duration-seconds="@durationSeconds"
+                                                             data-initial-max="@initialMax">
+                                                            @lesson.Content
+                                                        </div>
+                                                    }
+                                                </div>
+                                            }
+                                            else if (trackProgress && !lessonComplete)
+                                            {
+                                                <div class="lesson-content-tracker prose dark:prose-invert max-w-none p-6 h-full w-full overflow-y-auto bg-white dark:bg-slate-900 rounded-xl"
+                                                     data-content-tracker
+                                                     data-course-id="@Model.Course.Id"
+                                                     data-lesson-id="@lesson.Id"
+                                                     data-duration-seconds="@durationSeconds"
+                                                     data-initial-max="@initialMax">
+                                                    @lesson.Content
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="prose dark:prose-invert max-w-none p-6 h-full w-full overflow-y-auto bg-white dark:bg-slate-900 rounded-xl">
+                                                    @lesson.Content
+                                                </div>
+                                            }
+                                        </template>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (trackProgress)
+{
+    <input type="hidden" name="__RequestVerificationToken" value="@tokens.RequestToken" />
+}
+
+@section Scripts {
+    @if (trackProgress)
+    {
+        <script src="~/js/lesson-progress.js" asp-append-version="true"></script>
+    }
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+        // 1. Accordion logic
+        const toggles = document.querySelectorAll('.module-toggle');
+        toggles.forEach(toggle => {
+        toggle.addEventListener('click', function() {
+        const content = this.nextElementSibling;
+        const arrow = this.querySelector('.arrow-icon');
+
+        if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+        content.style.maxHeight = '0px';
+        if(arrow) arrow.style.transform = 'rotate(0deg)';
+        } else {
+        content.style.maxHeight = content.scrollHeight + "px";
+        if(arrow) arrow.style.transform = 'rotate(180deg)';
+        }
+        });
+        });
+
+        // 2. Lesson switching: clone the matching <template> (built server-side with the
+        // same video-kind branching the old CourseDetails.cshtml used) into the player pane.
+        const lessonRows = document.querySelectorAll('.lesson-item-row');
+        const playerContainer = document.getElementById('lesson-player-container');
+        const currentLessonHeader = document.getElementById('current-lesson-header');
+
+        function playLesson(row) {
+        lessonRows.forEach(r => r.classList.remove('bg-blue-50', 'dark:bg-gray-700', 'border-primary'));
+        row.classList.add('bg-blue-50', 'dark:bg-gray-700', 'border-primary');
+
+        const lessonId = row.getAttribute('data-lesson-id');
+        const title = row.getAttribute('data-title');
+        const template = document.querySelector(`template[data-lesson-player="${lessonId}"]`);
+
+        playerContainer.innerHTML = '';
+        if (template) {
+        playerContainer.appendChild(template.content.cloneNode(true));
+        }
+
+        // Re-render any lucide icons that just got inserted (e.g. external-link icon)
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+        }
+
+        // NOTE: lesson-progress.js needs to pick up the freshly inserted
+        // [data-course-id]/[data-content-tracker] elements. If it only wires up
+        // trackers once on DOMContentLoaded, listen for this event there too.
+        document.dispatchEvent(new CustomEvent('lesson-player:updated', { detail: { lessonId } }));
+
+        if (title && currentLessonHeader) {
+        currentLessonHeader.textContent = title;
+        }
+        }
+
+        lessonRows.forEach(row => {
+        row.addEventListener('click', function() {
+        playLesson(this);
+        });
+        });
+
+        // Auto-play the first lesson on startup if available
+        if (lessonRows.length > 0) {
+        playLesson(lessonRows[0]);
+        // Open the first module accordion automatically
+        const firstContent = document.querySelector('.module-content');
+        if (firstContent) {
+        firstContent.style.maxHeight = firstContent.scrollHeight + "px";
+        const firstArrow = document.querySelector('.arrow-icon');
+        if (firstArrow) firstArrow.style.transform = 'rotate(180deg)';
+        }
+        }
+
+        // 3. Dynamic Progress calculation update for UI
+        function updateOverallProgressBar() {
+        const items = document.querySelectorAll('.lesson-item-row');
+        if(items.length === 0) return;
+
+        let completedCount = 0;
+        items.forEach(item => {
+        if (item.getAttribute('data-complete') === 'true') {
+        completedCount++;
+        }
+        });
+
+        const percent = Math.round((completedCount / items.length) * 100);
+
+        const fill = document.getElementById('progress-bar-fill');
+        const bubble = document.getElementById('progress-bubble');
+        const percentText = document.getElementById('progress-percentage-text');
+        const overallText = document.getElementById('overall-progress-text');
+
+        if (fill) fill.style.width = percent + '%';
+        if (percentText) percentText.textContent = percent + '%';
+        if (overallText) overallText.textContent = completedCount;
+        if (bubble) {
+        bubble.style.right = percent + '%';
+        }
+        }
+
+        // Run initial progress setup calculation
+        updateOverallProgressBar();
+        });
+    </script>
+}

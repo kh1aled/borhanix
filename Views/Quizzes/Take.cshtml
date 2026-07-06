@@ -1,0 +1,48 @@
+@model QuizTakeViewModel
+@{
+    ViewData["Title"] = Model.Quiz.Title;
+    ViewData["PageTitle"] = "Quiz";
+}
+
+<form class="quiz-form" asp-action="Submit" method="post">
+    <input type="hidden" asp-for="QuizId" />
+    <section class="course-hero" style="--accent:#7c3aed">
+        <div>
+            <span class="badge"><i data-lucide="circle-help"></i>@Model.Quiz.Course.Code</span>
+            <h2>@Model.Quiz.Title</h2>
+            <p>@Model.Quiz.Summary</p>
+            <div class="course-meta">
+                <span>@Model.Quiz.Questions.Count questions</span>
+                <span>@Model.Quiz.TimeLimitMinutes minutes</span>
+                <span>@Model.Quiz.MaxPoints points</span>
+            </div>
+        </div>
+        @if (User.IsInRole(AppRoles.Instructor) || User.IsInRole(AppRoles.Admin))
+        {
+            <a class="button button-ghost" asp-action="Attempts" asp-route-id="@Model.Quiz.Id">Attempts</a>
+        }
+    </section>
+
+    <section class="question-list">
+        @foreach (var question in Model.Quiz.Questions.OrderBy(x => x.SortOrder))
+        {
+            <article class="question-card">
+                <h3>@question.Prompt</h3>
+                <div class="option-list">
+                    @foreach (var option in question.Options)
+                    {
+                        <label class="option-row">
+                            <input type="radio" name="SelectedOptions[@question.Id]" value="@option.Id" />
+                            <span>@option.Text</span>
+                        </label>
+                    }
+                </div>
+            </article>
+        }
+    </section>
+
+    @if (User.IsInRole(AppRoles.Student))
+    {
+        <button class="button" type="submit"><i data-lucide="check-circle-2"></i>Submit quiz</button>
+    }
+</form>

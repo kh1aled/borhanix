@@ -1,0 +1,50 @@
+@model QuizHistoryViewModel
+@{
+    ViewData["Title"] = "Quiz history";
+    ViewData["PageTitle"] = "Quiz results";
+}
+
+<section class="section-heading">
+    <div>
+        <span class="badge"><i data-lucide="history"></i> Your attempts</span>
+        <h2>Quiz results history</h2>
+    </div>
+</section>
+
+@if (Model.Attempts.Count == 0)
+{
+    <section class="empty-state">
+        <i data-lucide="circle-help"></i>
+        <h2>No quiz attempts yet</h2>
+        <p>Complete a quiz from one of your enrolled courses to see results here.</p>
+        <a class="button" asp-controller="Courses" asp-action="Index">Browse courses</a>
+    </section>
+}
+else
+{
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Course</th>
+                    <th>Quiz</th>
+                    <th>Score</th>
+                    <th>Submitted</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var attempt in Model.Attempts)
+                {
+                    <tr>
+                        <td>@attempt.Quiz.Course.Code</td>
+                        <td>@attempt.Quiz.Title</td>
+                        <td>@attempt.Score / @(attempt.Quiz.Questions.Sum(x => x.Points))</td>
+                        <td>@(attempt.SubmittedAt?.ToLocalTime().ToString("MMM d, yyyy h:mm tt") ?? "—")</td>
+                        <td><a asp-action="Result" asp-route-id="@attempt.Id">View details</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

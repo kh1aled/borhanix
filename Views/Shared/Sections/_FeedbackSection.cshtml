@@ -1,0 +1,116 @@
+﻿<section class="py-20 bg-[#eef2f9] dark:bg-third">
+    <style>
+            .feedback-swiper .swiper-button-prev,
+            .feedback-swiper .swiper-button-next {
+                display: none;
+            }
+
+            .custom-nav-btn {
+                width: 40px;
+                height: 40px;
+                background: white;
+                border-radius: 50%;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: background .2s, box-shadow .2s;
+                border: none;
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                z-index: 10;
+                color: #1e293b;
+            }
+
+                .custom-nav-btn:hover {
+                    background: #0d6efd;
+                    color: white;
+                    box-shadow: 0 4px 14px rgba(13,110,253,.35);
+                }
+
+                .custom-nav-btn.prev {
+                    left: -20px;
+                }
+
+                .custom-nav-btn.next {
+                    right: -20px;
+                }
+    </style>
+
+    <div class="max-w-7xl mx-auto px-8">
+        <div class="flex flex-col items-center text-center mb-14">
+            <h2 class="text-3xl font-bold text-[#052c65] dark:text-white mb-3">Hear From Our Students</h2>
+            <p class="text-[#6c757d] text-base dark:!text-gray-400">Discover What Learners Around the World Are Saying About Our Courses</p>
+        </div>
+
+        <div class="feedback-swiper relative px-6">
+            <button id="feedbackPrev" class="custom-nav-btn prev"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+            <button id="feedbackNext" class="custom-nav-btn next"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+
+            <div class="swiper">
+                <div class="swiper-wrapper">
+                    @{
+                        var reviews = new[]
+                        {
+                            new { Title = "\"Great Learning Experience Overall.\"", Name = "Cameron Lee", Avatar = "avatar-1.jpg", Date = "10 Jul 2025" },
+                            new { Title = "\"Fantastic Platform With Quality Courses.\"", Name = "Jamie Brooks", Avatar = "avatar-3.jpg", Date = "10 Jul 2025" },
+                            new { Title = "\"Excellent Support And Content.\"", Name = "Riley James", Avatar = "avatar-4.jpg", Date = "10 Jul 2025" },
+                            new { Title = "\"Highly Recommend To Everyone.\"", Name = "Ambus Kornil", Avatar = "avatar-6.jpg", Date = "10 Jul 2025" },
+                            new { Title = "\"Best Investment In My Career.\"", Name = "Sara Lin", Avatar = "avatar-4.jpg", Date = "10 Jul 2025" },
+                        };
+                        var comment = "In a professional context it often happens that private or corporate clients corder a publication to be made and presented with the actual.";
+                    }
+                    @foreach (var review in reviews)
+                    {
+                        <div class="swiper-slide">
+                            <div class="bg-white dark:bg-gray-800 rounded-2xl border border-[#e8edf7] dark:border-gray-600 shadow-sm hover:shadow-md transition-shadow duration-300 p-6 flex flex-col justify-between h-full">
+                                <div>
+                                    <div class="flex gap-1 mb-4">
+                                        @for (int i = 0; i < 5; i++)
+                                        {
+                                            <i data-lucide="star" class="w-5 h-5 text-yellow-400" style="fill:#FBBF24"></i>
+                                        }
+                                    </div>
+                                    <h3 class="text-[#1e293b] dark:text-white font-bold text-lg leading-snug mb-2 line-clamp-2 min-h-[56px]">@review.Title</h3>
+                                    <p class="text-[#6c757d] dark:text-slate-400 text-sm leading-relaxed line-clamp-4">@comment</p>                                </div>
+
+                                <div class="mt-6 bg-[#f5f7fb] dark:bg-gray-700 rounded-xl px-4 py-3 flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-12 h-12 rounded-full overflow-hidden bg-[#e2e8f0] shrink-0">
+                                            <img src="~/images/instructors/@review.Avatar" alt="@review.Name" class="w-full h-full object-cover" />
+                                        </div>
+                                        <div>
+                                            <p class="text-[#1e293b] dark:text-white font-semibold text-sm leading-tight">@review.Name</p>
+                                            <p class="text-[#6c757d] dark:text-gray-400 text-xs mt-0.5">@review.Date</p>
+                                        </div>
+                                    </div>
+                                    <span class="bg-primary text-white text-xs font-semibold px-4 py-1.5 rounded-full">Student</span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        new Swiper('.feedback-swiper .swiper', {
+            spaceBetween: 24,
+            slidesPerView: 3,
+            loop: true,
+            speed: 600,
+            autoplay: { delay: 3500, disableOnInteraction: false },
+            navigation: { nextEl: '#feedbackNext', prevEl: '#feedbackPrev' },
+            breakpoints: {
+                320: { slidesPerView: 1 },
+                640: { slidesPerView: 2 },
+                1024: { slidesPerView: 3 },
+            },
+        });
+    });
+</script>

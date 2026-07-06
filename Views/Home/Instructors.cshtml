@@ -1,0 +1,200 @@
+﻿@model IReadOnlyCollection<InstructorViewModel>
+@{
+    ViewData["Title"] = "Instructors";
+    ViewData["PageTitle"] = "Instructors";
+    Layout = "_LandingLayout";
+    var searchTerm = Context.Request.Query["name"].ToString();
+    var isFiltered = !string.IsNullOrWhiteSpace(searchTerm);
+
+    string Initials(string fullName)
+    {
+        if (string.IsNullOrWhiteSpace(fullName)) return "?";
+        var parts = fullName.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length switch
+        {
+            0 => "?",
+            1 => parts[0][0].ToString().ToUpper(),
+            _ => (parts[0][0].ToString() + parts[^1][0].ToString()).ToUpper()
+        };
+    }
+}
+
+<section class="px-[80px] pt-32 pb-8">
+
+    @* Page heading *@
+    <div class="mb-10 px-6 text-center">
+        <h1 class="mt-4 text-4xl font-extrabold text-slate-900 dark:text-white">
+            Our Instructors
+        </h1>
+        <p class="mx-auto mt-3 max-w-xl text-base leading-7 text-slate-500 dark:text-slate-400">
+            Learn from experienced educators who are dedicated to helping you master new skills.
+        </p>
+    </div>
+
+    @* Toolbar: count + search *@
+    <div class="mb-8 flex flex-col gap-4 px-6 sm:flex-row sm:items-center sm:justify-between">
+        <p class="text-lg font-semibold text-slate-800 dark:text-slate-100">
+            <span class="font-bold text-primary">@Model.Count</span> Instructor@(Model.Count == 1 ? "" : "s")
+        </p>
+
+        <form asp-controller="Home"
+              asp-action="Instructors"
+              method="get"
+              class="relative w-full sm:w-80">
+
+            <input type="text"
+                   name="name"
+                   value="@searchTerm"
+                   placeholder="Search instructors by name..."
+                   class="w-full rounded-2xl border border-slate-200 bg-white py-3 pr-24 pl-12 text-sm text-slate-700 shadow-sm transition outline-none
+            placeholder:text-slate-400
+            focus:border-primary focus:ring-4 focus:ring-primary/10
+            dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:placeholder:text-slate-500" />
+
+
+            <button type="submit"
+                    class="absolute top-1/2 right-2 -translate-y-1/2 rounded-full bg-primary p-2 font-semibold text-white transition hover:brightness-110 active:scale-95">
+                <i data-lucide="arrow-right" class="h-4 w-4"></i>
+            </button>
+        </form>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="flex min-h-[420px] items-center justify-center px-6">
+            <div class="w-full max-w-2xl rounded-3xl border border-slate-200 bg-white p-12 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900">
+
+                <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
+                    <i data-lucide="@(isFiltered ? "user-x" : "users")" class="h-10 w-10 text-primary"></i>
+                </div>
+
+                <h2 class="mt-6 text-3xl font-bold text-slate-900 dark:text-white">
+                    @(isFiltered ? "No Instructors Match Your Search" : "No Instructors Yet")
+                </h2>
+
+                <p class="mx-auto mt-3 max-w-lg text-base leading-7 text-slate-500 dark:text-slate-400">
+                    @if (isFiltered)
+                    {
+                        <text>We couldn't find any instructors matching <strong>"@searchTerm"</strong>. Try a different name.</text>
+                    }
+                    else
+                    {
+                        <text>There aren't any instructor profiles published yet. Check back soon.</text>
+                    }
+                </p>
+
+                @if (isFiltered)
+                {
+                    <div class="mt-8 flex flex-wrap justify-center gap-4">
+                        <a asp-controller="Home"
+                           asp-action="Instructors"
+                           class="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-lg">
+
+                            <i data-lucide="users" class="h-5 w-5"></i>
+                            View All Instructors
+                        </a>
+
+                        <button onclick="history.back()"
+                                class="inline-flex items-center gap-2 rounded-xl border border-slate-300 px-6 py-3 font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800">
+
+                            <i data-lucide="arrow-left" class="h-5 w-5"></i>
+                            Go Back
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="grid gap-6 px-6 sm:grid-cols-2 lg:grid-cols-3">
+            @foreach (var instructor in Model)
+            {
+                <div class="group relative flex flex-col overflow-hidden rounded-[28px] bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl dark:bg-slate-900">
+
+                    @* Cover banner tinted with the instructor's accent color *@
+                    <div class="relative h-24 w-full" style="background-color:@(instructor.AvatarColor)22;">
+                        <div class="pointer-events-none absolute inset-0 opacity-40">
+                            <span class="absolute top-4 right-8 h-6 w-6 rotate-12 rounded border-2 border-current" style="color:@instructor.AvatarColor;"></span>
+                            <span class="absolute right-20 bottom-3 h-2 w-2 rounded-full" style="background-color:@instructor.AvatarColor;"></span>
+                        </div>
+
+                        @if (instructor.IsApproved)
+                        {
+                            <span class="absolute top-3 right-4 inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-emerald-600 shadow dark:bg-slate-900/90">
+                                <i data-lucide="badge-check" class="h-3.5 w-3.5"></i>
+                                Verified
+                            </span>
+                        }
+                    </div>
+
+                    @* Avatar — overlapping the banner *@
+                    <div class="-mt-10 flex justify-center">
+                        @if (!string.IsNullOrWhiteSpace(instructor.ProfilePhotoUrl))
+                        {
+                            <img src="@instructor.ProfilePhotoUrl"
+                                 alt="@instructor.FullName"
+                                 class="h-20 w-20 rounded-full border-4 border-white object-cover shadow-md dark:border-slate-900" />
+                        }
+                        else
+                        {
+                            <div class="flex h-20 w-20 items-center justify-center rounded-full border-4 border-white text-lg font-bold text-white shadow-md dark:border-slate-900"
+                                 style="background-color:@instructor.AvatarColor;">
+                                @Initials(instructor.FullName)
+                            </div>
+                        }
+                    </div>
+
+                    @* Card body *@
+                    <div class="flex flex-1 flex-col items-center gap-3 px-6 pt-3 pb-6 text-center">
+
+                        <div>
+                            <h2 class="text-[17px] font-bold text-slate-800 dark:text-white">
+                                @instructor.FullName
+                            </h2>
+                            @if (!string.IsNullOrWhiteSpace(instructor.LevelOrTitle))
+                            {
+                                <p class="text-sm font-medium text-primary">@instructor.LevelOrTitle</p>
+                            }
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(instructor.Department))
+                        {
+                            <span class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-[11px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                                <i data-lucide="building-2" class="h-3.5 w-3.5"></i>
+                                @instructor.Department
+                            </span>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(instructor.Bio))
+                        {
+                            <p class="line-clamp-3 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+                                @instructor.Bio
+                            </p>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(instructor.OfficeHours))
+                        {
+                            <div class="mt-1 flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+                                <i data-lucide="clock" class="h-3.5 w-3.5 text-primary"></i>
+                                <span>@instructor.OfficeHours</span>
+                            </div>
+                        }
+
+                        @* CTA *@
+                        <div class="mt-auto w-full pt-3">
+                            <a asp-controller="Home"
+                               asp-action="InstructorDetails"
+                               asp-route-id="@instructor.Id"
+                               class="flex w-full items-center justify-center gap-2 rounded-xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700 transition group-hover:bg-primary group-hover:text-white dark:bg-slate-800 dark:text-slate-200">
+                                View Profile
+                                <i data-lucide="arrow-right" class="h-4 w-4 transition duration-300 group-hover:translate-x-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+</section>
