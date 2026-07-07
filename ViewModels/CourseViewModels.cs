@@ -48,9 +48,6 @@ public class CourseEditViewModel
 {
     public int? Id { get; set; }
 
-    [Required, MaxLength(24)]
-    public string Code { get; set; } = string.Empty;
-
     [Required, MaxLength(160)]
     public string Title { get; set; } = string.Empty;
 

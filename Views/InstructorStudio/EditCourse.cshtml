@@ -4,15 +4,32 @@
     ViewData["PageTitle"] = "Edit course";
 }
 
-<form class="editor-panel" asp-action="EditCourse" method="post">
-    <input type="hidden" asp-for="Id" />
-    <div class="form-heading">
-        <span class="badge"><i data-lucide="pencil"></i> Course editor</span>
-        <h2>@Model.Title</h2>
+<div class="mx-auto py-8 px-4 bg-white rounded-2xl dark:bg-gray-700 shadow-lg">
+
+    @* Header *@
+    <div class="mb-8">
+        <div class="flex items-center gap-2 text-[11px] font-semibold tracking-widest uppercase text-primary dark:text-white/50 mb-2">
+            <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+            Course editor
+        </div>
+        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">@Model.Title</h1>
+        <p class="text-sm text-gray-500 mt-1">Update the details below and save your changes.</p>
     </div>
-    <partial name="_CourseEditorFields" model="Model" />
-    <button class="button" type="submit"><i data-lucide="save"></i>Save changes</button>
-</form>
+
+    <form asp-action="EditCourse" method="post" class="flex flex-col gap-6" enctype="multipart/form-data">
+        <input type="hidden" asp-for="Id" />
+
+        <partial name="_CourseEditorFields" model="Model" />
+
+        <div class="flex justify-end pt-2 border-t border-gray-100 dark:border-gray-700">
+            <button type="submit"
+                    class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-medium hover:opacity-90 transition-opacity">
+                <i data-lucide="save" class="w-4 h-4"></i>
+                Save changes
+            </button>
+        </div>
+    </form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

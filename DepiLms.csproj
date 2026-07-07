@@ -20,6 +20,10 @@
 		<UpToDateCheckBuilt Include="wwwroot/css/site.css" Set="Css" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="wwwroot\uploads\courses\" />
+	</ItemGroup>
+
 	<Target Name="Tailwind" BeforeTargets="Build;PrepareForPublish">
 		<Exec Command="npm install" />
 		<Exec Command="npx tailwindcss -i ./wwwroot/css/site.css -o ./wwwroot/css/output.css --minify" />

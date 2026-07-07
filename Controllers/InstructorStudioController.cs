@@ -31,6 +31,53 @@ public class InstructorStudioController(
 
         return View(courses);
     }
+    [HttpGet]
+    public async Task<IActionResult> ManageContent(int id, int? lessonId)
+    {
+        var course = await db.Courses
+            .Include(x => x.Modules)
+                .ThenInclude(x => x.Lessons)
+            .Include(x => x.Assignments)
+            .FirstOrDefaultAsync(x => x.Id == id);
+
+        if (course is null)
+        {
+            return NotFound();
+        }
+
+        if (!CanManage(course))
+        {
+            return Forbid();
+        }
+
+        Lesson? selectedLesson = null;
+        if (lessonId is not null)
+        {
+            selectedLesson = course.Modules
+                .SelectMany(m => m.Lessons)
+                .FirstOrDefault(l => l.Id == lessonId);
+        }
+
+        ViewBag.SelectedLesson = selectedLesson;
+        ViewBag.SelectedModuleId = selectedLesson?.CourseModuleId;
+
+        return View(course);
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> TogglePublish(int id)
+    {
+        var course = await GetManageableCourseAsync(id);
+        if (course is null)
+        {
+            return Forbid();
+        }
+
+        course.IsPublished = !course.IsPublished;
+        await db.SaveChangesAsync();
+        TempData["Status"] = course.IsPublished ? "Course published." : "Course unpublished.";
+        return RedirectToAction(nameof(Index));
+    }
 
     [HttpGet]
     public IActionResult CreateCourse() => View(new CourseEditViewModel());
@@ -45,6 +92,8 @@ public class InstructorStudioController(
         }
 
         string? coverPhotoPath = null;
+        Console.WriteLine(model.CoverPhoto?.FileName);
+        Console.WriteLine(model.CoverPhoto?.Length);
         try
         {
             coverPhotoPath = await imageUpload.SaveCoverPhotoAsync(model.CoverPhoto);
@@ -54,10 +103,11 @@ public class InstructorStudioController(
             ModelState.AddModelError(nameof(CourseEditViewModel.CoverPhoto), ex.Message);
             return View(model);
         }
+        var code = await GenerateCourseCode(model.Title);
 
         db.Courses.Add(new Course
         {
-            Code = model.Code.Trim().ToUpperInvariant(),
+            Code = code,
             Title = model.Title,
             Summary = model.Summary,
             Description = model.Description,
@@ -75,6 +125,21 @@ public class InstructorStudioController(
         return RedirectToAction(nameof(Index));
     }
 
+    private async Task<string> GenerateCourseCode(string title)
+    {
+        string prefix = new string(title
+            .Trim()
+            .Where(char.IsLetter)
+            .Take(3)
+            .ToArray())
+            .ToUpper();
+
+        var count = await db.Courses.CountAsync() + 1;
+
+        return $"{prefix}-{count:D4}";
+    }
+
+
     [HttpGet]
     public async Task<IActionResult> EditCourse(int id)
     {
@@ -87,7 +152,6 @@ public class InstructorStudioController(
         return View(new CourseEditViewModel
         {
             Id = course.Id,
-            Code = course.Code,
             Title = course.Title,
             Summary = course.Summary,
             Description = course.Description,
@@ -135,7 +199,6 @@ public class InstructorStudioController(
             return View(model);
         }
 
-        course.Code = model.Code.Trim().ToUpperInvariant();
         course.Title = model.Title;
         course.Summary = model.Summary;
         course.Description = model.Description;

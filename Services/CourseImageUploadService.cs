@@ -61,7 +61,7 @@ public class CourseImageUploadService(IWebHostEnvironment environment) : ICourse
         }
 
         var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
-        if (AllowedExtensions.Contains(ext))
+        if (!AllowedExtensions.Contains(ext))
         {
             return false;
         }

@@ -5,120 +5,198 @@
      class="px-4 py-3 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-xl text-sm text-red-600 dark:text-red-400 empty:hidden"></div>
 
 @* Section: Identity *@
-<div class="bg-white dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-2xl overflow-hidden">
-    <div class="px-5 py-3.5 border-b border-zinc-100 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/40">
-        <span class="text-[11px] font-semibold tracking-widest uppercase text-zinc-400">Identity</span>
+<div class="bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden shadow-lg">
+    <div class="px-5 py-3.5 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40">
+        <span class="text-[11px] font-semibold tracking-widest uppercase text-gray-400">Identity</span>
     </div>
     <div class="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-        @* Code *@
-        <div class="flex flex-col gap-1.5">
-            <label asp-for="Code" class="text-xs font-medium text-zinc-600 dark:text-zinc-400"></label>
-            <input asp-for="Code" placeholder="DOTNET-101"
-                   class="px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" />
-            <span asp-validation-for="Code" class="text-xs text-red-500"></span>
-        </div>
-
         @* Title *@
         <div class="flex flex-col gap-1.5">
-            <label asp-for="Title" class="text-xs font-medium text-zinc-600 dark:text-zinc-400"></label>
+            <label asp-for="Title" class="text-xs font-medium text-gray-600 dark:text-gray-400"></label>
             <input asp-for="Title" placeholder="Course title"
-                   class="px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" />
+                   class="px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" />
             <span asp-validation-for="Title" class="text-xs text-red-500"></span>
+        </div>
+
+        @* Price *@
+        <div class="flex flex-col gap-1.5">
+            <label asp-for="Price" class="text-xs font-medium text-gray-600 dark:text-gray-400"></label>
+            <input asp-for="Price" type="number" min="0" step="0.01" placeholder="149.00"
+                   class="px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" />
+            <span asp-validation-for="Price" class="text-xs text-red-500"></span>
+        </div>
+
+        @* Currency *@
+        <div class="flex flex-col gap-1.5">
+            <label asp-for="Currency" class="text-xs font-medium text-gray-600 dark:text-gray-400"></label>
+            <input asp-for="Currency" maxlength="3" placeholder="USD"
+                   class="px-3 py-2 uppercase bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" />
+            <span asp-validation-for="Currency" class="text-xs text-red-500"></span>
         </div>
 
         @* Category *@
         <div class="flex flex-col gap-1.5">
-            <label asp-for="Category" class="text-xs font-medium text-zinc-600 dark:text-zinc-400"></label>
+            <label asp-for="Category" class="text-xs font-medium text-gray-600 dark:text-gray-400"></label>
             <input asp-for="Category"
-                   class="px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" />
+                   class="px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" />
             <span asp-validation-for="Category" class="text-xs text-red-500"></span>
         </div>
 
         @* Level *@
         <div class="flex flex-col gap-1.5">
-            <label asp-for="Level" class="text-xs font-medium text-zinc-600 dark:text-zinc-400"></label>
+            <label asp-for="Level" class="text-xs font-medium text-gray-600 dark:text-gray-400"></label>
             <input asp-for="Level"
-                   class="px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" />
+                   class="px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" />
             <span asp-validation-for="Level" class="text-xs text-red-500"></span>
         </div>
 
         @* Accent color *@
         <div class="flex flex-col gap-1.5">
-            <label asp-for="AccentColor" class="text-xs font-medium text-zinc-600 dark:text-zinc-400"></label>
+            <label asp-for="AccentColor" class="text-xs font-medium text-gray-600 dark:text-gray-400"></label>
             <div class="flex items-center gap-2">
                 <input asp-for="AccentColor" type="color"
-                       class="w-10 h-10 p-0.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg cursor-pointer" />
-                <span class="text-xs text-zinc-400">Pick a brand color for this course card</span>
+                       class="w-10 h-10 p-0.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer" />
+                <span class="text-xs text-gray-400">Pick a brand color for this course card</span>
             </div>
             <span asp-validation-for="AccentColor" class="text-xs text-red-500"></span>
         </div>
 
         @* Hero image URL *@
         <div class="flex flex-col gap-1.5">
-            <label asp-for="HeroImageUrl" class="text-xs font-medium text-zinc-600 dark:text-zinc-400"></label>
+            <label asp-for="HeroImageUrl" class="text-xs font-medium text-gray-600 dark:text-gray-400"></label>
             <input asp-for="HeroImageUrl" placeholder="https://..."
-                   class="px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" />
+                   class="px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" />
+            <span class="text-xs text-gray-500">
+                Leave this field empty if you want to upload an image from your device using the Cover Photo section below.
+            </span>
             <span asp-validation-for="HeroImageUrl" class="text-xs text-red-500"></span>
         </div>
 
-        <div class="flex flex-col gap-1.5">
-            <label asp-for="Price" class="text-xs font-medium text-zinc-600 dark:text-zinc-400"></label>
-            <input asp-for="Price" type="number" min="0" step="0.01" placeholder="149.00"
-                   class="px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" />
-            <span asp-validation-for="Price" class="text-xs text-red-500"></span>
-        </div>
 
-        <div class="flex flex-col gap-1.5">
-            <label asp-for="Currency" class="text-xs font-medium text-zinc-600 dark:text-zinc-400"></label>
-            <input asp-for="Currency" maxlength="3" placeholder="USD"
-                   class="px-3 py-2 uppercase bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" />
-            <span asp-validation-for="Currency" class="text-xs text-red-500"></span>
+        @* Photo Upload Drop Zone with Live Preview *@
+        <div class="flex flex-col gap-0">
+            <label class="text-xs font-medium text-gray-600 dark:text-gray-400">Cover Photo</label>
+
+            <div class="flex items-center justify-center w-full">
+                <label id="coverPhotoDropzone"
+                       for="@Html.IdFor(m => m.CoverPhoto)"
+                       class="relative flex flex-col items-center justify-center
+                    w-full h-64 border-2 border-dashed rounded-xl
+                    border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50
+                    hover:bg-primary/5 dark:hover:bg-primary/10 hover:border-primary
+                    cursor-pointer transition-colors group overflow-hidden">
+
+                    @* Placeholder state — hidden by default if a cover photo already exists *@
+                    <div id="coverPhotoPlaceholder"
+                         class="@(string.IsNullOrEmpty(Model.CoverPhotoPath) ? "" : "hidden") flex flex-col items-center justify-center gap-3 text-gray-400 dark:text-gray-500 pt-5 pb-6 px-4">
+                        <svg class="w-10 h-10 group-hover:text-primary transition-colors" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h3a3 3 0 0 0 0-6h-.025a5.56 5.56 0 0 0 .025-.5A5.5 5.5 0 0 0 7.207 9.021C7.137 9.017 7.071 9 7 9a4 4 0 1 0 0 8h2.167M12 19v-9m0 0-2 2m2-2 2 2" />
+                        </svg>
+                        <p class="text-sm text-center">
+                            <span class="font-semibold text-gray-600 dark:text-gray-300 group-hover:text-primary transition-colors">Click to upload</span>
+                            or drag and drop
+                        </p>
+                        <span class="px-4 py-1 bg-primary text-white text-xs font-medium rounded-lg group-hover:opacity-90 transition">
+                            Browse files
+                        </span>
+                        <span class="text-xs text-gray-400">JPG, JPEG, PNG — max 15 MB</span>
+                    </div>
+
+                    @* Preview state — pre-filled with the existing cover photo when editing *@
+                    <img id="coverPhotoPreview"
+                         src="@(string.IsNullOrEmpty(Model.CoverPhotoPath) ? "#" : Url.Content(Model.CoverPhotoPath))"
+                         alt="Cover photo preview"
+                         class="@(string.IsNullOrEmpty(Model.CoverPhotoPath) ? "hidden" : "") absolute inset-0 w-full h-full object-cover" />
+
+                    @* Hover overlay — visible from the start if an existing photo is shown *@
+                    <div id="coverPhotoOverlay"
+                         class="@(string.IsNullOrEmpty(Model.CoverPhotoPath) ? "hidden" : "flex") absolute inset-0 bg-black/0 group-hover:bg-black/40 items-center justify-center transition-colors">
+                        <span class="opacity-0 group-hover:opacity-100 px-4 py-1.5 bg-white/90 dark:bg-gray-900/90 text-gray-800 dark:text-gray-100 text-xs font-medium rounded-lg transition-opacity">
+                            Click to change photo
+                        </span>
+                    </div>
+
+                    <input asp-for="CoverPhoto" id="CoverPhoto" type="file" accept=".jpg,.jpeg,.png" class="sr-only" />
+                </label>
+            </div>
+            <span asp-validation-for="CoverPhoto" class="text-xs text-red-500"></span>
         </div>
     </div>
 </div>
 
 @* Section: Content *@
-<div class="bg-white dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-2xl overflow-hidden">
-    <div class="px-5 py-3.5 border-b border-zinc-100 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/40">
-        <span class="text-[11px] font-semibold tracking-widest uppercase text-zinc-400">Content</span>
+<div class="bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden">
+    <div class="px-5 py-3.5 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40">
+        <span class="text-[11px] font-semibold tracking-widest uppercase text-gray-400">Content</span>
     </div>
     <div class="p-5 flex flex-col gap-4">
 
         @* Summary *@
         <div class="flex flex-col gap-1.5">
-            <label asp-for="Summary" class="text-xs font-medium text-zinc-600 dark:text-zinc-400"></label>
+            <label asp-for="Summary" class="text-xs font-medium text-gray-600 dark:text-gray-400"></label>
             <input asp-for="Summary" placeholder="Short catalog summary (shown on course cards)"
-                   class="px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" />
+                   class="px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" />
             <span asp-validation-for="Summary" class="text-xs text-red-500"></span>
         </div>
 
         @* Description *@
         <div class="flex flex-col gap-1.5">
-            <label asp-for="Description" class="text-xs font-medium text-zinc-600 dark:text-zinc-400"></label>
+            <label asp-for="Description" class="text-xs font-medium text-gray-600 dark:text-gray-400"></label>
             <textarea asp-for="Description" rows="8" placeholder="Detailed course description visible on the course page"
-                      class="px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none transition-all"></textarea>
+                      class="px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none transition-all"></textarea>
             <span asp-validation-for="Description" class="text-xs text-red-500"></span>
         </div>
     </div>
 </div>
 
 @* Section: Visibility *@
-<div class="bg-white dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-2xl overflow-hidden">
-    <div class="px-5 py-3.5 border-b border-zinc-100 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/40">
-        <span class="text-[11px] font-semibold tracking-widest uppercase text-zinc-400">Visibility</span>
+<div class="bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden">
+    <div class="px-5 py-3.5 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40">
+        <span class="text-[11px] font-semibold tracking-widest uppercase text-gray-400">Visibility</span>
     </div>
     <div class="px-5 py-4">
-        <label class="flex items-center gap-3 cursor-pointer group w-fit">
+        <label for="@Html.IdFor(m => m.IsPublished)" class="flex items-center gap-3 cursor-pointer group w-fit">
             <div class="relative">
-                <input asp-for="IsPublished" type="checkbox" class="peer sr-only" />
-                <div class="w-10 h-6 bg-zinc-200 dark:bg-zinc-700 rounded-full transition-colors peer-checked:bg-primary"></div>
+                <input id="IsPublished" asp-for="IsPublished" type="checkbox" class="peer sr-only" />
+                <div class="w-10 h-6 bg-gray-200 dark:bg-gray-700 rounded-full transition-colors peer-checked:bg-primary"></div>
                 <div class="absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
             </div>
             <div>
-                <span class="text-sm font-medium text-zinc-800 dark:text-zinc-100">Published</span>
-                <p class="text-xs text-zinc-400 mt-0.5">Students can find and enroll in this course</p>
+                <span class="text-sm font-medium text-gray-800 dark:text-gray-100">Published</span>
+                <p class="text-xs text-gray-400 mt-0.5">Students can find and enroll in this course</p>
             </div>
         </label>
     </div>
 </div>
+
+    <script>
+     document.addEventListener('DOMContentLoaded', function () {
+
+        const input = document.getElementById('CoverPhoto');
+        const preview = document.getElementById('coverPhotoPreview');
+        const placeholder = document.getElementById('coverPhotoPlaceholder');
+        const overlay = document.getElementById('coverPhotoOverlay');
+
+        if (!input) return;
+
+        input.addEventListener('change', function () {
+
+            const file = this.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+                overlay.classList.remove('hidden');
+                overlay.classList.add('flex');
+            };
+
+            reader.readAsDataURL(file);
+        });
+
+    });
+    </script>

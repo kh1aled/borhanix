@@ -4,19 +4,19 @@
     ViewData["PageTitle"] = "Create course";
 }
 
-<div class="max-w-3xl mx-auto py-8 px-4">
+<div class="mx-auto py-8 px-4 bg-white rounded-2xl dark:bg-gray-700 shadow-lg">
 
     @* Header *@
     <div class="mb-8">
-        <div class="flex items-center gap-2 text-[11px] font-semibold tracking-widest uppercase text-primary mb-2">
+        <div class="flex items-center gap-2 text-[11px] font-semibold tracking-widest uppercase text-primary dark:text-white/50 mb-2">
             <i data-lucide="plus" class="w-3.5 h-3.5"></i>
             Course builder
         </div>
-        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">New LMS course</h1>
+        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">Create New Course</h1>
         <p class="text-sm text-gray-500 mt-1">Fill in the details below to publish a new course.</p>
     </div>
 
-    <form asp-action="CreateCourse" method="post" class="flex flex-col gap-6">
+    <form asp-action="CreateCourse" method="post" class="flex flex-col gap-6" enctype="multipart/form-data">
         <partial name="_CourseEditorFields" model="Model" />
 
         <div class="flex justify-end pt-2 border-t border-gray-100 dark:border-gray-700">

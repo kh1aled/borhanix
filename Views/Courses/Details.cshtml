@@ -233,6 +233,11 @@
                         <img src="@Model.Course.HeroImageUrl" alt="@Model.Course.Title"
                              class="h-full w-full object-cover" />
                     }
+                    else if (!string.IsNullOrWhiteSpace(Model.Course.CoverPhotoPath))
+                    {
+                        <img src="@Model.Course.CoverPhotoPath" alt="@Model.Course.Title"
+                             class="h-full w-full object-cover" />
+                    }
                     else
                     {
                         <div class="flex h-full items-center justify-center"
