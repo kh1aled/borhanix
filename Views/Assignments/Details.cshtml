@@ -2,84 +2,371 @@
 @{
     ViewData["Title"] = Model.Assignment.Title;
     ViewData["PageTitle"] = "Assignment";
+
+    @* ---- Display-only status derivation (student view). No Model/ViewModel changes. ---- *@
+    var studentStatus = "pending";
+    if (Model.MySubmission is not null)
+    {
+        if (Model.MySubmission.Score is not null)
+        {
+            studentStatus = "graded";
+        }
+        else if (Model.MySubmission.SubmittedAt > Model.Assignment.DueAt)
+        {
+            studentStatus = "late";
+        }
+        else
+        {
+            studentStatus = "submitted";
+        }
+    }
+
+    var dueLocal = Model.Assignment.DueAt.ToLocalTime();
+    var remaining = dueLocal - DateTime.Now;
+    var isPastDue = remaining.TotalSeconds <= 0;
 }
 
-<section class="course-hero" style="--accent:#d97706">
-    <div>
-        <span class="badge"><i data-lucide="clipboard-check"></i>@Model.Assignment.Course.Code</span>
-        <h2>@Model.Assignment.Title</h2>
-        <p>@Model.Assignment.Brief</p>
-        <div class="course-meta">
-            <span>@Model.Assignment.MaxPoints points</span>
-            <span>Due @Model.Assignment.DueAt.ToLocalTime().ToString("MMM d, yyyy")</span>
+@* ================= HERO ================= *@
+<section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary to-blue-700 dark:from-slate-900 dark:via-slate-900 dark:to-primary/30 p-8 md:p-10 mb-8 shadow-lg shadow-primary/10">
+    <div class="pointer-events-none absolute -right-16 -top-16 w-72 h-72 bg-white/10 rounded-full blur-3xl"></div>
+    <div class="pointer-events-none absolute -left-10 bottom-0 w-56 h-56 bg-white/5 rounded-full blur-3xl"></div>
+
+    <div class="relative z-10 flex flex-col gap-5">
+        <div class="flex flex-wrap items-center gap-3">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-white/15 backdrop-blur px-3 py-1.5 text-sm font-medium text-white ring-1 ring-white/25">
+                <i data-lucide="clipboard-check" class="w-4 h-4"></i>
+                @Model.Assignment.Course.Code
+            </span>
+
+            @if (Model.CanSubmit)
+            {
+                @if (studentStatus == "graded")
+                {
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/90 px-3 py-1.5 text-sm font-semibold text-white ring-1 ring-white/25">
+                        <i data-lucide="badge-check" class="w-4 h-4"></i> Graded
+                    </span>
+                }
+                else if (studentStatus == "late")
+                {
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-500/90 px-3 py-1.5 text-sm font-semibold text-white ring-1 ring-white/25">
+                        <i data-lucide="alarm-clock" class="w-4 h-4"></i> Late
+                    </span>
+                }
+                else if (studentStatus == "submitted")
+                {
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-sky-500/90 px-3 py-1.5 text-sm font-semibold text-white ring-1 ring-white/25">
+                        <i data-lucide="file-check-2" class="w-4 h-4"></i> Submitted
+                    </span>
+                }
+                else
+                {
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1.5 text-sm font-semibold text-white ring-1 ring-white/25">
+                        <i data-lucide="circle-dashed" class="w-4 h-4"></i> Pending
+                    </span>
+                }
+            }
+        </div>
+
+        <h1 class="text-2xl md:text-3xl font-bold text-white tracking-tight">@Model.Assignment.Title</h1>
+        <p class="text-white/80 max-w-2xl leading-relaxed">@Model.Assignment.Brief</p>
+
+        <div class="flex flex-wrap gap-x-8 gap-y-3 pt-2 text-sm text-white/90">
+            <div class="flex items-center gap-2">
+                <i data-lucide="star" class="w-4 h-4"></i>
+                <span>@Model.Assignment.MaxPoints points</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <i data-lucide="calendar" class="w-4 h-4"></i>
+                <span>Due @dueLocal.ToString("MMM d, yyyy")</span>
+            </div>
+            @if (Model.CanSubmit)
+            {
+                <div class="flex items-center gap-2">
+                    <i data-lucide="clock" class="w-4 h-4"></i>
+                    @if (isPastDue)
+                    {
+                        <span>Due date has passed</span>
+                    }
+                    else
+                    {
+                        <span>@((int)remaining.TotalDays) day@(((int)remaining.TotalDays == 1) ? "" : "s") left</span>
+                    }
+                </div>
+            }
         </div>
     </div>
 </section>
 
-<section class="content-grid">
-    <div>
+@* ================= CONTENT GRID ================= *@
+<section class="grid grid-cols-1 @(Model.CanGrade ? "lg:grid-cols-3" : "") gap-6 items-start">
+
+    <div class="@(Model.CanGrade ? "lg:col-span-2" : "") flex flex-col gap-6">
+
+        @* ---------------- STUDENT SUBMISSION WORKSPACE ---------------- *@
         @if (Model.CanSubmit)
         {
-            <form class="editor-panel" asp-action="Submit" method="post" enctype="multipart/form-data">
+            <form class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 md:p-7 shadow-sm hover:shadow-md transition-all duration-300"
+                  asp-action="Submit" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="AssignmentId" value="@Model.Assignment.Id" />
-                <div class="form-heading">
-                    <span class="badge"><i data-lucide="upload"></i> Student submission</span>
-                    <h2>@(Model.MySubmission is null ? "Submit work" : "Update submission")</h2>
+
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 text-primary">
+                        <i data-lucide="upload" class="w-5 h-5"></i>
+                    </span>
+                    <div>
+                        <p class="text-xs font-medium uppercase tracking-wide text-slate-400 dark:text-slate-500">Student submission</p>
+                        <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
+                            @(Model.MySubmission is null ? "Submit your work" : "Update your submission")
+                        </h2>
+                    </div>
                 </div>
-                <label>File URL</label>
-                <input name="FileUrl" value="@Model.MySubmission?.FileUrl" placeholder="GitHub, Drive, or hosted file link" />
-                <label>Upload file</label>
-                <input name="SubmissionFile" type="file" accept=".pdf,.zip,.docx,.png,.jpg,.jpeg" />
-                <label>Notes</label>
-                <textarea name="Notes" rows="5">@Model.MySubmission?.Notes</textarea>
-                <button class="button" type="submit"><i data-lucide="send"></i>Submit assignment</button>
+
+                <div class="flex flex-col gap-5">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">File URL</label>
+                        <div class="relative">
+                            <i data-lucide="link" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <input name="FileUrl" value="@Model.MySubmission?.FileUrl"
+                                   placeholder="GitHub, Drive, or hosted file link"
+                                   class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300" />
+                        </div>
+                        <p class="mt-1.5 text-xs text-slate-400 dark:text-slate-500">Paste a link if your work is hosted elsewhere.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Upload file</label>
+                        <label class="group flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 px-6 py-8 text-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-all duration-300">
+                            <span class="inline-flex items-center justify-center w-11 h-11 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-primary group-hover:scale-105 transition-transform duration-300">
+                                <i data-lucide="file-up" class="w-5 h-5"></i>
+                            </span>
+                            <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Click to browse or drop a file here</span>
+                            <span class="text-xs text-slate-400 dark:text-slate-500">PDF, ZIP, DOCX, PNG, JPG, JPEG</span>
+                            <input name="SubmissionFile" type="file" accept=".pdf,.zip,.docx,.png,.jpg,.jpeg" class="hidden" />
+                        </label>
+                        <p class="mt-1.5 text-xs text-slate-400 dark:text-slate-500">Optional if you provided a file URL above.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Notes</label>
+                        <textarea name="Notes" rows="5"
+                                  placeholder="Anything your instructor should know about this submission..."
+                                  class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300 resize-none">@Model.MySubmission?.Notes</textarea>
+                    </div>
+
+                    <button type="submit"
+                            class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary text-white font-semibold text-sm px-5 py-3 shadow-sm hover:shadow-lg hover:bg-primary/90 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                        Submit assignment
+                    </button>
+                </div>
             </form>
         }
 
+        @* ---------------- SUBMISSION SUMMARY ---------------- *@
         @if (Model.MySubmission is not null)
         {
-            <article class="submission-summary">
-                <span class="badge"><i data-lucide="file-check"></i>Your submission</span>
-                <p>Submitted @Model.MySubmission.SubmittedAt.ToLocalTime().ToString("MMM d, h:mm tt")</p>
+            <article class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 md:p-7 shadow-sm hover:shadow-md transition-all duration-300">
+                <div class="flex items-center justify-between flex-wrap gap-3 mb-5">
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-primary/10 text-primary px-3 py-1 text-sm font-medium">
+                        <i data-lucide="file-check" class="w-4 h-4"></i>
+                        Your submission
+                    </span>
+                    <span class="text-xs text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
+                        <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                        Submitted @Model.MySubmission.SubmittedAt.ToLocalTime().ToString("MMM d, h:mm tt")
+                    </span>
+                </div>
+
                 @if (!string.IsNullOrWhiteSpace(Model.MySubmission.FileUrl))
                 {
-                    <a class="button button-ghost button-small" href="@Model.MySubmission.FileUrl" target="_blank">Open file</a>
+                    <a class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 px-3.5 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 hover:border-primary hover:text-primary transition-all duration-300 mb-4"
+                       href="@Model.MySubmission.FileUrl" target="_blank">
+                        <i data-lucide="external-link" class="w-4 h-4"></i>
+                        Open file
+                    </a>
                 }
-                <p>@Model.MySubmission.Notes</p>
+
+                @if (!string.IsNullOrWhiteSpace(Model.MySubmission.Notes))
+                {
+                    <div class="rounded-xl bg-slate-50 dark:bg-slate-800/60 px-4 py-3 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                        @Model.MySubmission.Notes
+                    </div>
+                }
+
                 @if (Model.MySubmission.Score is not null)
                 {
-                    <strong>@Model.MySubmission.Score / @Model.Assignment.MaxPoints</strong>
-                    <p>@Model.MySubmission.Feedback</p>
+                    <div class="mt-6 rounded-2xl bg-gradient-to-br from-primary/5 to-emerald-50 dark:from-primary/10 dark:to-emerald-900/10 border border-primary/10 p-6">
+                        <p class="text-xs font-medium uppercase tracking-wide text-slate-400 dark:text-slate-500 mb-2">Your grade</p>
+                        <div class="flex items-baseline gap-2 mb-4">
+                            <span class="text-4xl font-bold @(Model.MySubmission.Score >= Model.Assignment.MaxPoints * 0.9m ? "text-emerald-600 dark:text-emerald-400" : "text-primary")">
+                                @Model.MySubmission.Score
+                            </span>
+                            <span class="text-lg text-slate-400 dark:text-slate-500">/ @Model.Assignment.MaxPoints</span>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(Model.MySubmission.Feedback))
+                        {
+                            <div class="rounded-xl bg-white/70 dark:bg-slate-900/50 border border-slate-200/70 dark:border-slate-700/70 px-4 py-3">
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400 dark:text-slate-500 mb-1.5">Instructor feedback</p>
+                                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">@Model.MySubmission.Feedback</p>
+                            </div>
+                        }
+                    </div>
                 }
             </article>
         }
     </div>
 
+    @* ================= INSTRUCTOR DASHBOARD ================= *@
     @if (Model.CanGrade)
     {
-        <aside class="activity-panel">
-            <div class="section-heading">
-                <h2>Submissions</h2>
-            </div>
-            @foreach (var submission in Model.Submissions)
-            {
-                <div class="activity-item grade-item">
-                    <span>@submission.SubmittedAt.ToLocalTime().ToString("MMM d, h:mm tt")</span>
-                    <strong>@submission.Student.FullName</strong>
-                    @if (!string.IsNullOrWhiteSpace(submission.FileUrl))
-                    {
-                        <a href="@submission.FileUrl" target="_blank">Open work</a>
-                    }
-                    <form asp-action="Grade" method="post">
-                        <input type="hidden" name="SubmissionId" value="@submission.Id" />
-                        <label>Score</label>
-                        <input name="Score" type="number" min="0" max="@Model.Assignment.MaxPoints" step="0.5" value="@(submission.Score ?? 0)" />
-                        <label>Feedback</label>
-                        <textarea name="Feedback" rows="3">@submission.Feedback</textarea>
-                        <button class="button button-small" type="submit">Grade</button>
-                    </form>
+      
+            
+            var totalStudents = Model.Submissions.Select(s => s.Student.Id).Distinct().Count();
+            var totalSubmissions = Model.Submissions.Count();
+            var pendingCount = Model.Submissions.Count(s => s.Score == null);
+            var gradedCount = Model.Submissions.Count(s => s.Score != null);
+            var gradedScores = Model.Submissions.Where(s => s.Score != null).Select(s => s.Score!.Value).ToList();
+            var avgScore = gradedScores.Count > 0 ? gradedScores.Average() : 0;
+            var highScore = gradedScores.Count > 0 ? gradedScores.Max() : 0;
+            
+        
+
+        <aside class="lg:col-span-1 flex flex-col gap-6">
+
+            @* ---- Analytics cards ---- *@
+            <div class="grid grid-cols-2 gap-3">
+                <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm hover:shadow-md transition-all duration-300">
+                    <div class="flex items-center gap-2 text-slate-400 dark:text-slate-500 mb-2">
+                        <i data-lucide="users" class="w-4 h-4"></i>
+                        <span class="text-xs font-medium uppercase tracking-wide">Students</span>
+                    </div>
+                    <p class="text-2xl font-bold text-slate-900 dark:text-white">@totalStudents</p>
                 </div>
-            }
+                <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm hover:shadow-md transition-all duration-300">
+                    <div class="flex items-center gap-2 text-slate-400 dark:text-slate-500 mb-2">
+                        <i data-lucide="inbox" class="w-4 h-4"></i>
+                        <span class="text-xs font-medium uppercase tracking-wide">Submissions</span>
+                    </div>
+                    <p class="text-2xl font-bold text-slate-900 dark:text-white">@totalSubmissions</p>
+                </div>
+                <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm hover:shadow-md transition-all duration-300">
+                    <div class="flex items-center gap-2 text-amber-500 mb-2">
+                        <i data-lucide="hourglass" class="w-4 h-4"></i>
+                        <span class="text-xs font-medium uppercase tracking-wide">Pending</span>
+                    </div>
+                    <p class="text-2xl font-bold text-slate-900 dark:text-white">@pendingCount</p>
+                </div>
+                <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm hover:shadow-md transition-all duration-300">
+                    <div class="flex items-center gap-2 text-emerald-500 mb-2">
+                        <i data-lucide="badge-check" class="w-4 h-4"></i>
+                        <span class="text-xs font-medium uppercase tracking-wide">Graded</span>
+                    </div>
+                    <p class="text-2xl font-bold text-slate-900 dark:text-white">@gradedCount</p>
+                </div>
+                <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm hover:shadow-md transition-all duration-300">
+                    <div class="flex items-center gap-2 text-primary mb-2">
+                        <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+                        <span class="text-xs font-medium uppercase tracking-wide">Average</span>
+                    </div>
+                    <p class="text-2xl font-bold text-slate-900 dark:text-white">@avgScore.ToString("0.#")</p>
+                </div>
+                <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm hover:shadow-md transition-all duration-300">
+                    <div class="flex items-center gap-2 text-primary mb-2">
+                        <i data-lucide="trophy" class="w-4 h-4"></i>
+                        <span class="text-xs font-medium uppercase tracking-wide">Highest</span>
+                    </div>
+                    <p class="text-2xl font-bold text-slate-900 dark:text-white">@highScore.ToString("0.#")</p>
+                </div>
+            </div>
+
+            @* ---- Student submission cards ---- *@
+            <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 md:p-6 shadow-sm">
+                <div class="flex items-center gap-3 mb-5">
+                    <span class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-primary/10 text-primary">
+                        <i data-lucide="graduation-cap" class="w-4.5 h-4.5"></i>
+                    </span>
+                    <h2 class="text-base font-semibold text-slate-900 dark:text-white">Submissions</h2>
+                </div>
+
+                @if (!Model.Submissions.Any())
+                {
+                    <div class="flex flex-col items-center text-center gap-2 py-10 text-slate-400 dark:text-slate-500">
+                        <i data-lucide="inbox" class="w-8 h-8"></i>
+                        <p class="text-sm">No submissions yet.</p>
+                    </div>
+                }
+
+                <div class="flex flex-col gap-4">
+                    @foreach (var submission in Model.Submissions)
+                    {
+                        var isGraded = submission.Score is not null;
+                        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 p-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300">
+                            <div class="flex items-start justify-between gap-3 mb-3">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <span class="flex-shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary font-semibold text-sm">
+                                        @(submission.Student.FullName.Length > 0 ? submission.Student.FullName.Substring(0, 1).ToUpper() : "?")
+                                    </span>
+                                    <div class="min-w-0">
+                                        <p class="text-sm font-semibold text-slate-900 dark:text-white truncate">@submission.Student.FullName</p>
+                                        <p class="text-xs text-slate-400 dark:text-slate-500">@submission.SubmittedAt.ToLocalTime().ToString("MMM d, h:mm tt")</p>
+                                    </div>
+                                </div>
+                                @if (isGraded)
+                                {
+                                    <span class="flex-shrink-0 inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 px-2.5 py-1 text-xs font-semibold">
+                                        <i data-lucide="badge-check" class="w-3.5 h-3.5"></i> Graded
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="flex-shrink-0 inline-flex items-center gap-1 rounded-full bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 px-2.5 py-1 text-xs font-semibold">
+                                        <i data-lucide="hourglass" class="w-3.5 h-3.5"></i> Pending
+                                    </span>
+                                }
+                            </div>
+
+                            <div class="flex items-center justify-between gap-3 mb-4">
+                                @if (!string.IsNullOrWhiteSpace(submission.FileUrl))
+                                {
+                                    <a href="@submission.FileUrl" target="_blank"
+                                       class="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline">
+                                        <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                                        Open work
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span></span>
+                                }
+                                <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                                    @(submission.Score?.ToString() ?? "—") <span class="text-slate-400 dark:text-slate-500 font-normal">/ @Model.Assignment.MaxPoints</span>
+                                </span>
+                            </div>
+
+                            <form asp-action="Grade" method="post" class="rounded-xl bg-slate-50 dark:bg-slate-800/60 p-4 flex flex-col gap-3">
+                                <input type="hidden" name="SubmissionId" value="@submission.Id" />
+                                <div class="grid grid-cols-1 sm:grid-cols-[110px_1fr] gap-3 items-start">
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Score</label>
+                                        <input name="Score" type="number" min="0" max="@Model.Assignment.MaxPoints" step="0.5" value="@(submission.Score ?? 0)"
+                                               class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Feedback</label>
+                                        <textarea name="Feedback" rows="2"
+                                                  class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300 resize-none">@submission.Feedback</textarea>
+                                    </div>
+                                </div>
+                                <button type="submit"
+                                        class="self-end inline-flex items-center gap-1.5 rounded-lg bg-primary text-white text-xs font-semibold px-4 py-2 hover:bg-primary/90 hover:shadow-md transition-all duration-300">
+                                    <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                                    Save grade
+                                </button>
+                            </form>
+                        </div>
+                    }
+                </div>
+            </div>
         </aside>
     }
 </section>

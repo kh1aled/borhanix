@@ -251,7 +251,7 @@ public class InstructorStudioController(
             await db.SaveChangesAsync();
         }
 
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction(nameof(ManageContent) , new { id = model.CourseId});
     }
 
     [HttpPost, ValidateAntiForgeryToken]
@@ -289,8 +289,7 @@ public class InstructorStudioController(
                 videoDurationSeconds = videoDuration.TryGetDurationSeconds(
                     environment.WebRootPath, resolvedUrl, model.DurationMinutes, model.VideoDurationSeconds);
             }
-
-            db.Lessons.Add(new Lesson
+            var newLesson = new Lesson
             {
                 CourseModuleId = model.ModuleId,
                 Title = model.Title,
@@ -300,11 +299,16 @@ public class InstructorStudioController(
                 DurationMinutes = model.DurationMinutes,
                 VideoDurationSeconds = videoDurationSeconds,
                 SortOrder = await db.Lessons.CountAsync(x => x.CourseModuleId == model.ModuleId) + 1
-            });
+            };
+
+            db.Lessons.Add(newLesson);
             await db.SaveChangesAsync();
+            return RedirectToAction(nameof(ManageContent), new { id = module.CourseId, lessonId = newLesson.Id });
+
         }
 
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction(nameof(ManageContent), new { id = module.CourseId});
+
     }
 
     [HttpGet]
@@ -353,7 +357,7 @@ public class InstructorStudioController(
         module.Summary = model.Summary;
         await db.SaveChangesAsync();
         TempData["Status"] = "Module updated.";
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction(nameof(ManageContent), new { id = module.CourseId });
     }
 
     [HttpPost, ValidateAntiForgeryToken]
@@ -382,7 +386,7 @@ public class InstructorStudioController(
         db.CourseModules.Remove(module);
         await db.SaveChangesAsync();
         TempData["Status"] = "Module removed.";
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction(nameof(ManageContent), new { id = module.CourseId });
     }
 
     [HttpGet]

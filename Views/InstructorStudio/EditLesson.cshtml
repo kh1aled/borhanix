@@ -1,55 +1,215 @@
 @model LessonEditViewModel
+
 @{
-    ViewData["Title"] = "Edit lesson";
-    ViewData["PageTitle"] = "Edit lesson";
+    ViewData["Title"] = "Edit Lesson";
+    ViewData["PageTitle"] = "Edit Lesson";
 }
 
-<form class="editor-panel" asp-action="EditLesson" method="post" enctype="multipart/form-data">
-    <input type="hidden" asp-for="Id" />
-    <input type="hidden" asp-for="ModuleId" />
-    <input type="hidden" asp-for="CourseId" />
-    <input type="hidden" asp-for="VideoDurationSeconds" id="VideoDurationSeconds" />
-    <div class="form-heading">
-        <span class="badge"><i data-lucide="pencil"></i> Lesson editor</span>
-        <h2>@Model.Title</h2>
+<div class="mx-auto py-8 px-4 bg-white dark:bg-gray-700 rounded-2xl shadow-lg">
+
+    @* Header *@
+    <div class="mb-8">
+        <div class="flex items-center gap-2 text-[11px] font-semibold tracking-widest uppercase text-primary dark:text-white/50 mb-2">
+            <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+            Lesson editor
+        </div>
+
+        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">
+            @Model.Title
+        </h1>
+
+        <p class="text-sm text-gray-500 mt-1">
+            Update the lesson information and save your changes.
+        </p>
     </div>
-    <div class="form-grid">
-        <div>
-            <label asp-for="Title">Title</label>
-            <input asp-for="Title" />
+
+    <form asp-action="EditLesson"
+          method="post"
+          enctype="multipart/form-data"
+          class="flex flex-col gap-6">
+
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="ModuleId" />
+        <input type="hidden" asp-for="CourseId" />
+        <input type="hidden" asp-for="VideoDurationSeconds" id="VideoDurationSeconds" />
+
+        <div asp-validation-summary="ModelOnly"
+             class="px-4 py-3 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-xl text-sm text-red-600 dark:text-red-400 empty:hidden">
         </div>
-        <div>
-            <label asp-for="DurationMinutes">Duration (minutes, fallback)</label>
-            <input asp-for="DurationMinutes" type="number" />
+
+        @* Lesson Information *@
+        <div class="bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden">
+
+            <div class="px-5 py-3.5 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40">
+                <span class="text-[11px] font-semibold tracking-widest uppercase text-gray-400">
+                    Lesson Information
+                </span>
+            </div>
+
+            <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                <div class="flex flex-col gap-1.5">
+                    <label asp-for="Title" class="text-xs font-medium text-gray-600 dark:text-gray-400"></label>
+
+                    <input asp-for="Title"
+                           placeholder="Lesson title"
+                           class="px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" />
+
+                    <span asp-validation-for="Title" class="text-xs text-red-500"></span>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label asp-for="DurationMinutes" class="text-xs font-medium text-gray-600 dark:text-gray-400"></label>
+
+                    <input asp-for="DurationMinutes"
+                           type="number"
+                           min="0"
+                           placeholder="15"
+                           class="px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" />
+
+                    <span asp-validation-for="DurationMinutes" class="text-xs text-red-500"></span>
+                </div>
+
+            </div>
+
         </div>
-        <div>
-            <label asp-for="VideoUrl">Video URL</label>
-            <input asp-for="VideoUrl" id="VideoUrl" placeholder="Video URL or upload below" />
+
+        @* Content *@
+        <div class="bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden">
+
+            <div class="px-5 py-3.5 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40">
+                <span class="text-[11px] font-semibold tracking-widest uppercase text-gray-400">
+                    Lesson Content
+                </span>
+            </div>
+
+            <div class="p-5">
+
+                <div class="flex flex-col gap-1.5">
+
+                    <label asp-for="Content" class="text-xs font-medium text-gray-600 dark:text-gray-400"></label>
+
+                    <textarea asp-for="Content"
+                              rows="10"
+                              placeholder="Write the lesson content..."
+                              class="px-3 py-2 resize-none bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"></textarea>
+
+                    <span asp-validation-for="Content" class="text-xs text-red-500"></span>
+
+                </div>
+
+            </div>
+
         </div>
-        <div>
-            <label asp-for="ResourceUrl">Resource URL</label>
-            <input asp-for="ResourceUrl" />
+
+        @* Media *@
+        <div class="bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden">
+
+            <div class="px-5 py-3.5 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40">
+                <span class="text-[11px] font-semibold tracking-widest uppercase text-gray-400">
+                    Lesson Media
+                </span>
+            </div>
+
+            <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                <div class="flex flex-col gap-1.5">
+
+                    <label asp-for="VideoUrl" class="text-xs font-medium text-gray-600 dark:text-gray-400"></label>
+
+                    <input asp-for="VideoUrl"
+                           id="VideoUrl"
+                           placeholder="https://..."
+                           class="px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" />
+
+                    <span asp-validation-for="VideoUrl" class="text-xs text-red-500"></span>
+
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+
+                    <label asp-for="ResourceUrl" class="text-xs font-medium text-gray-600 dark:text-gray-400"></label>
+
+                    <input asp-for="ResourceUrl"
+                           placeholder="https://..."
+                           class="px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" />
+
+                    <span asp-validation-for="ResourceUrl" class="text-xs text-red-500"></span>
+
+                </div>
+
+                <div class="md:col-span-2 flex flex-col gap-1.5">
+
+                    <label asp-for="VideoFile"
+                           class="text-xs font-medium text-gray-600 dark:text-gray-400">
+                    </label>
+
+                    <input asp-for="VideoFile"
+                           id="VideoFile"
+                           type="file"
+                           accept=".mp4,.webm,.mov,.m4v"
+                           class="block w-full text-sm file:mr-4 file:px-4 file:py-2 file:border-0 file:bg-primary file:text-white file:rounded-lg file:cursor-pointer border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900" />
+
+                    <span asp-validation-for="VideoFile" class="text-xs text-red-500"></span>
+
+                </div>
+
+                <div class="md:col-span-2">
+
+                    <div class="flex items-center gap-2 rounded-xl bg-primary/5 border border-primary/10 px-4 py-3">
+
+                        <i data-lucide="clock-3"
+                           class="w-4 h-4 text-primary"></i>
+
+                        <span id="duration-preview"
+                              class="text-sm text-gray-700 dark:text-gray-300">
+                            Stored video duration:
+                            @(Model.VideoDurationSeconds?.ToString() ?? "Not set")
+                            seconds
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
-        <div>
-            <label asp-for="VideoFile">Upload video</label>
-            <input asp-for="VideoFile" type="file" accept=".mp4,.webm,.mov,.m4v" id="VideoFile" />
+
+        <div class="flex justify-between items-center pt-2 border-t border-gray-100 dark:border-gray-700">
+
+            <a asp-action="ManageContent"
+               asp-route-id="@Model.CourseId"
+               class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+
+                <i data-lucide="arrow-left" class="w-4 h-4"></i>
+
+                Back
+
+            </a>
+
+            <button type="submit"
+                    class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-medium hover:opacity-90 transition-opacity">
+
+                <i data-lucide="save" class="w-4 h-4"></i>
+
+                Save Changes
+
+            </button>
+
         </div>
-        <div class="full-width">
-            <label asp-for="Content">Content</label>
-            <textarea asp-for="Content" rows="8"></textarea>
-        </div>
-    </div>
-    <p id="duration-preview">Stored video duration: @(Model.VideoDurationSeconds?.ToString() ?? "not set") seconds</p>
-    <div class="button-row">
-        <button class="button" type="submit"><i data-lucide="save"></i>Save changes</button>
-        <a class="button button-ghost" asp-action="Index">Cancel</a>
-    </div>
-</form>
+
+    </form>
+
+</div>
 
 @section Scripts {
+
     <partial name="_ValidationScriptsPartial" />
+
     <script>
-        (function () {
+        (() => {
+
             const urlInput = document.getElementById('VideoUrl');
             const fileInput = document.getElementById('VideoFile');
             const hidden = document.getElementById('VideoDurationSeconds');
@@ -57,29 +217,48 @@
 
             function setDuration(seconds) {
                 if (!seconds || seconds <= 0) return;
+
                 hidden.value = Math.round(seconds);
-                preview.textContent = `Stored video duration: ${Math.round(seconds)} seconds`;
+
+                preview.textContent =
+                    `Stored video duration: ${Math.round(seconds)} seconds`;
             }
 
-            function probeUrl(url) {
+            function probe(url) {
+
                 if (!url) return;
+
                 const video = document.createElement('video');
+
                 video.preload = 'metadata';
+
                 video.onloadedmetadata = () => setDuration(video.duration);
+
                 video.src = url;
             }
 
-            urlInput?.addEventListener('change', () => probeUrl(urlInput.value));
+            urlInput?.addEventListener('change', () => probe(urlInput.value));
+
             fileInput?.addEventListener('change', () => {
+
                 const file = fileInput.files?.[0];
+
                 if (!file) return;
+
                 const video = document.createElement('video');
+
                 video.preload = 'metadata';
+
                 video.onloadedmetadata = () => setDuration(video.duration);
+
                 video.src = URL.createObjectURL(file);
+
             });
 
-            if (urlInput?.value) probeUrl(urlInput.value);
+            if (urlInput?.value)
+                probe(urlInput.value);
+
         })();
     </script>
+
 }

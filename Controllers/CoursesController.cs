@@ -65,86 +65,135 @@ public class CoursesController(
     public async Task<IActionResult> Details(int id)
     {
         var course = await db.Courses
-            .Include(x => x.CreatedBy)
-            .Include(x => x.Modules.OrderBy(m => m.SortOrder))
-            .ThenInclude(x => x.Lessons.OrderBy(l => l.SortOrder))
-            .Include(x => x.Assignments)
-            .Include(x => x.Quizzes)
-            .ThenInclude(x => x.Questions)
-            .Include(x => x.Announcements)
-            .Include(x => x.Enrollments)
-            .FirstOrDefaultAsync(x => x.Id == id);
+            .AsNoTracking()
+            .Where(c => c.Id == id)
+            .Select(c => new CourseDetailsCardViewModel
+            {
+                Id = c.Id,
+                Code = c.Code,
+                Title = c.Title,
+                Summary = c.Summary,
+                Description = c.Description,
+                Category = c.Category,
+                Level = c.Level,
+                HeroImageUrl = c.HeroImageUrl,
+                CoverPhotoPath = c.CoverPhotoPath,
+                AccentColor = c.AccentColor,
+                Price = c.Price,
+                Currency = c.Currency,
+                IsPublished = c.IsPublished,
+                CreatedAt = c.CreatedAt,
+                CreatedById = c.CreatedById
+            })
+            .FirstOrDefaultAsync();
 
         if (course is null)
-        {
             return NotFound();
-        }
+
+        var modules = await db.CourseModules
+            .AsNoTracking()
+            .Where(m => m.CourseId == id)
+            .OrderBy(m => m.SortOrder)
+            .Select(m => new ModuleCardViewModel
+            {
+                Id = m.Id,
+                SortOrder = m.SortOrder,
+                Title = m.Title,
+                Summary = m.Summary,
+                Lessons = m.Lessons
+                    .OrderBy(l => l.SortOrder)
+                    .Select(l => new LessonCardViewModel
+                    {
+                        Id = l.Id,
+                        SortOrder = l.SortOrder,
+                        Title = l.Title,
+                        DurationMinutes = l.DurationMinutes
+                    })
+                    .ToList()
+            })
+            .ToListAsync();
 
         var userId = userManager.GetUserId(User);
-        var enrollment = await db.Enrollments.FirstOrDefaultAsync(x => x.CourseId == id && x.StudentId == userId);
-        var isInCart = await db.CartItems.AnyAsync(x => x.CourseId == id && x.StudentId == userId);
-        var isSaved = await db.SavedCourses.AnyAsync(x => x.CourseId == id && x.StudentId == userId);
-        var canManage = User.IsInRole(AppRoles.Admin) || course.CreatedById == userId;
 
-        var quizAttemptIds = new Dictionary<int, int>();
-        var completedLessonIds = new HashSet<int>();
-        var lessonProgressMap = new Dictionary<int, LessonProgressInfo>();
-        CourseCompletionStatus? completionStatus = null;
-        var canGenerateCertificate = false;
-        int? certificateId = null;
+        var studentsCount = await db.Enrollments
+            .AsNoTracking()
+            .CountAsync(e => e.CourseId == id && e.Status == EnrollmentStatus.Approved);
 
-        if (userId is not null && User.IsInRole(AppRoles.Student))
-        {
-            var progressRecords = await db.LessonProgressRecords
-                .Where(x => x.StudentId == userId && x.Lesson.CourseModule.CourseId == id)
-                .ToListAsync();
-
-            foreach (var record in progressRecords)
+        var instructorInfo = await db.Users
+            .AsNoTracking()
+            .Where(u => u.Id == course.CreatedById)
+            .Select(u => new InstructorInfoViewModel
             {
-                lessonProgressMap[record.LessonId] = new LessonProgressInfo
-                {
-                    MaxWatchedSeconds = record.MaxWatchedSeconds,
-                    ViewingPercent = record.ViewingPercent,
-                    IsComplete = record.CompletedAt is not null
-                };
+                FullName = u.FullName,
+                Bio = u.Bio
+            })
+            .FirstOrDefaultAsync();
 
-                if (record.CompletedAt is not null)
-                {
-                    completedLessonIds.Add(record.LessonId);
-                }
-            }
+        var enrollment = await db.Enrollments
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.CourseId == id && x.StudentId == userId);
 
-            quizAttemptIds = await db.QuizAttempts
-                .Where(x => x.StudentId == userId && x.Quiz.CourseId == id)
-                .ToDictionaryAsync(x => x.QuizId, x => x.Id);
+        var isInCart = await db.CartItems
+            .AsNoTracking()
+            .AnyAsync(x => x.CourseId == id && x.StudentId == userId);
 
-            if (enrollment?.Status == EnrollmentStatus.Approved)
+        var isSaved = await db.SavedCourses
+            .AsNoTracking()
+            .AnyAsync(x => x.CourseId == id && x.StudentId == userId);
+
+        var quizzes = await db.Quizzes
+            .AsNoTracking()
+            .Where(q => q.CourseId == id)
+            .Select(q => new QuizCardViewModel
             {
-                completionStatus = await completionService.GetStatusAsync(id, userId);
-                canGenerateCertificate = completionStatus.IsComplete;
-            }
+                Id = q.Id,
+                Title = q.Title,
+                QuestionsCount = q.Questions.Count(),
+                TimeLimitMinutes = q.TimeLimitMinutes
+            })
+            .ToListAsync();
 
-            certificateId = await db.CourseCertificates
-                .Where(x => x.CourseId == id && x.StudentId == userId)
-                .Select(x => (int?)x.Id)
-                .FirstOrDefaultAsync();
-        }
+        var assignments = await db.Assignments
+            .AsNoTracking()
+            .Where(a => a.CourseId == id)
+            .Select(a => new AssignmentCardViewModel
+            {
+                Id = a.Id,
+                Title = a.Title,
+                MaxPoints = a.MaxPoints,
+                DueAt = a.DueAt
+            })
+            .ToListAsync();
 
-        return View(new CourseDetailsViewModel
+        var canManage =
+            User.IsInRole(AppRoles.Admin) ||
+            course.CreatedById == userId;
+
+        return View(new CourseShowViewModel
         {
             Course = course,
+            Modules = modules,
+
+            StudentsEnrolledCount = studentsCount,
+            ModulesCount = modules.Count,
+            LessonsCount = modules.Sum(m => m.Lessons.Count),
+
             Enrollment = enrollment,
-            CanRequestEnrollment = User.IsInRole(AppRoles.Student) && enrollment is null,
+            CanRequestEnrollment =
+                User.IsInRole(AppRoles.Student) && enrollment is null,
+
             IsInCart = isInCart,
             IsSaved = isSaved,
+
             CanManage = canManage,
-            QuizAttemptIds = quizAttemptIds,
-            CompletedLessonIds = completedLessonIds,
-            LessonProgressMap = lessonProgressMap,
-            CompletionStatus = completionStatus,
-            CanGenerateCertificate = canGenerateCertificate && certificateId is null,
-            CertificateId = certificateId,
-            CreatedBy = course.CreatedBy
+
+            InstructorInfo = instructorInfo!,
+
+            Quizzes = quizzes,
+            QuizzesCount = quizzes.Count,
+
+            Assignments = assignments,
+            AssignmentsCount = assignments.Count
         });
     }
 

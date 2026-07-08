@@ -2,10 +2,6 @@
 @{
     ViewData["Title"] = "Manage content";
     ViewData["PageTitle"] = "Manage content";
-
-    @* NOTE: this assumes the ManageContent controller action optionally passes the selected lesson
-       via ViewBag.SelectedLesson (a Lesson entity) and ViewBag.SelectedModuleId (int?), e.g. when the
-       page is requested as /Instructor/ManageContent/5?lessonId=12. See the notes below the code. *@
     var selectedLesson = ViewBag.SelectedLesson as Lesson;
     var selectedModuleId = ViewBag.SelectedModuleId as int?;
 }
@@ -69,12 +65,53 @@
                     @foreach (var module in Model.Modules.OrderBy(x => x.SortOrder))
                     {
                         <details class="group rounded-xl overflow-hidden" open="@(selectedModuleId == module.Id || selectedModuleId == null && module == Model.Modules.OrderBy(x => x.SortOrder).First())">
-                            <summary class="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/40 hover:bg-gray-100 dark:hover:bg-gray-900/70 cursor-pointer list-none select-none transition-colors">
-                                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-400 flex-shrink-0 transition-transform group-open:rotate-90"></i>
-                                <span class="flex-1 text-sm font-medium text-gray-800 dark:text-gray-100 truncate">@module.Title</span>
-                                <span class="text-[10px] text-gray-400 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded-full flex-shrink-0">
+                            <summary class="group flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm transition-all duration-200 hover:border-primary/30 hover:bg-gray-50 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:hover:bg-gray-800 cursor-pointer list-none select-none">
+
+                                <!-- Arrow -->
+                                <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
+                                    <i data-lucide="chevron-right"
+                                       class="h-4 w-4 text-gray-500 transition-transform duration-200 group-open:rotate-90">
+                                    </i>
+                                </div>
+
+                                <!-- Module Info -->
+                                <div class="min-w-0 flex-1">
+                                    <h3 class="truncate text-sm font-semibold text-gray-800 dark:text-white">
+                                        @module.Title
+                                    </h3>
+
+                                    <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                                        @module.Lessons.Count lesson@(module.Lessons.Count == 1 ? "" : "s")
+                                    </p>
+                                </div>
+
+                                <!-- Lesson Count -->
+                                <span class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
                                     @module.Lessons.Count
                                 </span>
+
+                                <!-- Actions -->
+                                <div class="flex items-center gap-1">
+
+                                    <a asp-action="EditModule"
+                                       asp-route-id="@module.Id"
+                                       class="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 transition hover:bg-blue-50 hover:text-primary dark:hover:bg-blue-900/20">
+                                        <i data-lucide="square-pen" class="h-4 w-4"></i>
+                                    </a>
+
+                                    <form asp-action="DeleteModule"
+                                          asp-route-id="@module.Id"
+                                          method="post">
+
+                                        <button type="submit"
+                                                class="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 transition hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20">
+                                            <i data-lucide="trash-2" class="h-4 w-4"></i>
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
                             </summary>
 
                             <div class="pl-3 pr-1.5 py-1.5 flex flex-col gap-1">

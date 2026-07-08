@@ -44,6 +44,118 @@ public class CourseDetailsViewModel
     public ApplicationUser? CreatedBy { get; set; }
 }
 
+
+public class CourseShowViewModel
+{
+    public CourseDetailsCardViewModel Course { get; set; } = default!;
+    public string InstructorName { get; set; } = string.Empty;
+
+    public int StudentsEnrolledCount { get; set; }
+
+    public int ModulesCount { get; set; }
+
+    public int LessonsCount { get; set; }
+
+    public int QuizzesCount { get; set; }
+
+    public int AssignmentsCount { get; set; }
+
+    public bool CanRequestEnrollment { get; set; }
+
+    public bool IsInCart { get; set; }
+    public bool IsSaved { get; set; }
+    public bool CanManage { get; set; }
+
+    public List<ModuleCardViewModel> Modules { get; set; } = [];
+    public Enrollment? Enrollment { get; set; }
+
+    public InstructorInfoViewModel InstructorInfo { get; set; } = default!;
+
+    public List<AssignmentCardViewModel> Assignments { get; set; } = [];
+
+    public List<QuizCardViewModel> Quizzes { get; set; } = [];
+
+}
+
+public class CourseDetailsCardViewModel
+{
+    public int Id { get; set; }
+
+    public string Code { get; set; } = string.Empty;
+
+    public string Title { get; set; } = string.Empty;
+
+    public string Summary { get; set; } = string.Empty;
+
+    public string Description { get; set; } = string.Empty;
+
+    public string Category { get; set; } = "Technology";
+
+    public string Level { get; set; } = "Beginner";
+
+    public string? HeroImageUrl { get; set; }
+
+    public string? CoverPhotoPath { get; set; }
+
+    public string AccentColor { get; set; } = "#14b8a6";
+
+    public decimal Price { get; set; }
+
+    public string Currency { get; set; } = "USD";
+
+    public bool IsPublished { get; set; } = true;
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+
+    public string CreatedById { get; set; } = string.Empty;
+
+}
+
+public class ModuleCardViewModel
+{
+    public int Id { get; set; }
+
+    public int SortOrder { get; set; }
+
+    public string Title { get; set; } = string.Empty;
+
+    public string? Summary { get; set; }
+
+    public List<LessonCardViewModel> Lessons { get; set; } = [];
+}
+public class LessonCardViewModel
+{
+    public int Id { get; set; }
+
+    public int SortOrder { get; set; }
+
+    public string Title { get; set; } = string.Empty;
+
+    public int DurationMinutes { get; set; }
+}
+
+public class AssignmentCardViewModel
+{
+    public int Id { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public decimal MaxPoints { get; set; }
+    public DateTimeOffset DueAt { get; set; }
+}
+
+public class QuizCardViewModel
+{
+    public int Id { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public int QuestionsCount { get; set; }
+    public int TimeLimitMinutes { get; set; }
+}
+
+public class InstructorInfoViewModel
+{
+    public string FullName { get; set; } = string.Empty;
+    public string? Bio { get; set; }
+}
+
+
 public class CourseEditViewModel
 {
     public int? Id { get; set; }

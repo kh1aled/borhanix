@@ -3,116 +3,133 @@
     ViewData["Title"] = "Quiz review";
     ViewData["PageTitle"] = "Quiz review";
     var percentage = Model.MaxScore > 0 ? Math.Round((Model.Attempt.Score ?? 0) / Model.MaxScore * 100, 1) : 0;
+    var isPassing = percentage >= 70;
 }
 
-<style>
-        .quiz-review-summary { margin-bottom: 1.5rem; }
-        .quiz-review-list { display: grid; gap: 1rem; }
-        .quiz-review-question {
-            border-radius: 12px;
-            padding: 1.25rem;
-            border: 2px solid transparent;
-        }
-        .quiz-review-question.is-correct {
-            background: #ecfdf5;
-            border-color: #22c55e;
-        }
-        .quiz-review-question.is-incorrect {
-            background: #fef2f2;
-            border-color: #ef4444;
-        }
-        .quiz-review-question h3 { margin: 0 0 0.75rem; font-size: 1.05rem; }
-        .quiz-review-options { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.5rem; }
-        .quiz-review-option {
-            padding: 0.65rem 0.85rem;
-            border-radius: 8px;
-            background: #fff;
-            border: 1px solid #e2e8f0;
-        }
-        .quiz-review-option.is-selected { font-weight: 600; }
-        .quiz-review-option.is-correct-answer { border-color: #22c55e; background: #f0fdf4; }
-        .quiz-review-option.is-wrong-selected { border-color: #ef4444; background: #fff1f2; }
-        .quiz-review-badge {
-            display: inline-block;
-            padding: 0.2rem 0.55rem;
-            border-radius: 999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-left: 0.5rem;
-        }
-        .quiz-review-badge.correct { background: #22c55e; color: #fff; }
-        .quiz-review-badge.incorrect { background: #ef4444; color: #fff; }
-        .quiz-review-meta { color: #64748b; font-size: 0.875rem; margin-top: 0.75rem; }
-        @@media print {
-            .no-print { display: none !important; }
-        }
-</style>
+@* ================= SUMMARY HERO ================= *@
+<section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-600 via-violet-600 to-primary dark:from-slate-900 dark:via-slate-900 dark:to-violet-900/30 p-8 md:p-10 mb-6 shadow-lg shadow-violet-600/10">
+    <div class="pointer-events-none absolute -right-16 -top-16 w-72 h-72 bg-white/10 rounded-full blur-3xl"></div>
+    <div class="pointer-events-none absolute -left-10 bottom-0 w-56 h-56 bg-white/5 rounded-full blur-3xl"></div>
 
-<section class="course-hero quiz-review-summary" style="--accent:#7c3aed">
-    <div>
-        <span class="badge"><i data-lucide="clipboard-check"></i>Quiz review</span>
-        <h2>@Model.Attempt.Quiz.Title</h2>
-        @if (!Model.IsOwner)
-        {
-            <p>Student: <strong>@Model.Attempt.Student.FullName</strong></p>
-        }
-        <p>Score: <strong>@Model.Attempt.Score / @Model.MaxScore</strong> (@percentage%)</p>
-        @if (Model.Attempt.SubmittedAt is not null)
-        {
-            <div class="course-meta">
-                <span>Submitted @Model.Attempt.SubmittedAt.Value.ToLocalTime().ToString("MMM d, yyyy h:mm tt")</span>
+    <div class="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+        <div class="flex flex-col gap-3">
+            <span class="inline-flex items-center gap-1.5 w-fit rounded-full bg-white/15 backdrop-blur px-3 py-1.5 text-sm font-medium text-white ring-1 ring-white/25">
+                <i data-lucide="clipboard-check" class="w-4 h-4"></i>
+                Quiz review
+            </span>
+
+            <h1 class="text-2xl md:text-3xl font-bold text-white tracking-tight">@Model.Attempt.Quiz.Title</h1>
+
+            @if (!Model.IsOwner)
+            {
+                <p class="text-white/80 flex items-center gap-1.5">
+                    <i data-lucide="user" class="w-4 h-4"></i>
+                    Student: <strong class="font-semibold text-white">@Model.Attempt.Student.FullName</strong>
+                </p>
+            }
+
+            @if (Model.Attempt.SubmittedAt is not null)
+            {
+                <div class="flex items-center gap-2 text-sm text-white/70">
+                    <i data-lucide="calendar" class="w-4 h-4"></i>
+                    <span>Submitted @Model.Attempt.SubmittedAt.Value.ToLocalTime().ToString("MMM d, yyyy h:mm tt")</span>
+                </div>
+            }
+        </div>
+
+        <div class="flex items-center gap-4 rounded-2xl bg-white/10 backdrop-blur px-6 py-4 ring-1 ring-white/20">
+            <div class="flex flex-col items-center">
+                <span class="text-3xl md:text-4xl font-bold text-white leading-none">@Model.Attempt.Score<span class="text-lg font-medium text-white/60"> / @Model.MaxScore</span></span>
+                <span class="mt-1.5 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold @(isPassing ? "bg-emerald-500/90 text-white" : "bg-red-500/90 text-white")">
+                    <i data-lucide="@(isPassing ? "check-circle" : "alert-circle")" class="w-3.5 h-3.5"></i>
+                    @percentage%
+                </span>
             </div>
-        }
+        </div>
     </div>
-    <div class="button-row no-print">
-        <a class="button button-ghost" asp-controller="Courses" asp-action="Details" asp-route-id="@Model.Attempt.Quiz.CourseId">Back to course</a>
+
+    <div class="print:hidden relative z-10 flex flex-wrap gap-3 mt-6">
+        <a class="inline-flex items-center gap-2 rounded-xl bg-white/15 backdrop-blur text-white font-semibold text-sm px-4 py-2.5 ring-1 ring-white/25 hover:bg-white/25 transition-all duration-300"
+           asp-controller="Courses" asp-action="Details" asp-route-id="@Model.Attempt.Quiz.CourseId">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            Back to course
+        </a>
         @if (User.IsInRole(AppRoles.Student))
         {
-            <a class="button button-ghost" asp-action="History">All quiz results</a>
+            <a class="inline-flex items-center gap-2 rounded-xl bg-white/15 backdrop-blur text-white font-semibold text-sm px-4 py-2.5 ring-1 ring-white/25 hover:bg-white/25 transition-all duration-300"
+               asp-action="History">
+                <i data-lucide="history" class="w-4 h-4"></i>
+                All quiz results
+            </a>
         }
     </div>
 </section>
 
-<section class="quiz-review-list">
+@* ================= QUESTION REVIEW LIST ================= *@
+<section class="flex flex-col gap-5">
+    @{ var reviewIndex = 0; }
     @foreach (var item in Model.Questions)
     {
-        <article class="quiz-review-question @(item.IsCorrect ? "is-correct" : "is-incorrect")">
-            <h3>
-                @item.Question.Prompt
-                <span class="quiz-review-badge @(item.IsCorrect ? "correct" : "incorrect")">
-                    @(item.IsCorrect ? "Correct" : "Incorrect")
+        reviewIndex++;
+        <article class="rounded-2xl border-2 p-6 md:p-7 shadow-sm transition-all duration-300 @(item.IsCorrect
+            ? "border-emerald-300 bg-emerald-50/60 dark:border-emerald-700/60 dark:bg-emerald-900/10"
+            : "border-red-300 bg-red-50/60 dark:border-red-700/60 dark:bg-red-900/10")">
+
+            <div class="flex items-start gap-3 mb-5">
+                <span class="flex-shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 font-semibold text-sm">
+                    @reviewIndex
                 </span>
-            </h3>
-            <ul class="quiz-review-options">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <h3 class="text-base md:text-lg font-semibold text-slate-900 dark:text-white leading-snug">@item.Question.Prompt</h3>
+                    <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold @(item.IsCorrect ? "bg-emerald-500 text-white" : "bg-red-500 text-white")">
+                        <i data-lucide="@(item.IsCorrect ? "check" : "x")" class="w-3.5 h-3.5"></i>
+                        @(item.IsCorrect ? "Correct" : "Incorrect")
+                    </span>
+                </div>
+            </div>
+
+            <ul class="flex flex-col gap-2.5 pl-11 list-none">
                 @foreach (var option in item.Question.Options)
                 {
                     var isSelected = item.SelectedOption?.Id == option.Id;
                     var isCorrectAnswer = option.IsCorrect;
-                    var css = isSelected && isCorrectAnswer ? "is-selected is-correct-answer"
-                        : isSelected ? "is-selected is-wrong-selected"
-                        : isCorrectAnswer && !item.IsCorrect ? "is-correct-answer"
-                        : "";
-                    <li class="quiz-review-option @css">
-                        @option.Text
+                    var optionClasses = isSelected && isCorrectAnswer
+                        ? "border-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 font-semibold text-slate-900 dark:text-emerald-200"
+                        : isSelected
+                            ? "border-red-400 bg-red-50 dark:bg-red-900/20 font-semibold text-slate-900 dark:text-red-200"
+                            : isCorrectAnswer && !item.IsCorrect
+                                ? "border-emerald-300 bg-emerald-50/60 dark:bg-emerald-900/10 text-slate-700 dark:text-slate-300"
+                                : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300";
+
+                    <li class="flex items-center flex-wrap gap-2 rounded-xl border px-4 py-3 text-sm transition-all duration-300 @optionClasses">
+                        <span>@option.Text</span>
                         @if (isSelected)
                         {
-                            <span class="quiz-review-badge @(item.IsCorrect ? "correct" : "incorrect")">Your answer</span>
+                            <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold @(item.IsCorrect ? "bg-emerald-500 text-white" : "bg-red-500 text-white")">
+                                Your answer
+                            </span>
                         }
                         @if (isCorrectAnswer && !item.IsCorrect)
                         {
-                            <span class="quiz-review-badge correct">Correct answer</span>
+                            <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold bg-emerald-500 text-white">
+                                Correct answer
+                            </span>
                         }
                     </li>
                 }
             </ul>
+
             @if (!item.IsCorrect)
             {
-                <p class="quiz-review-meta">
-                    You selected: <strong>@(item.SelectedOption?.Text ?? "No answer")</strong>.
-                    Correct answer: <strong>@item.CorrectOption?.Text</strong>.
+                <p class="pl-11 mt-4 text-sm text-slate-500 dark:text-slate-400">
+                    You selected: <strong class="text-slate-700 dark:text-slate-200">@(item.SelectedOption?.Text ?? "No answer")</strong>.
+                    Correct answer: <strong class="text-slate-700 dark:text-slate-200">@item.CorrectOption?.Text</strong>.
                 </p>
             }
-            <p class="quiz-review-meta">@item.Question.Points points</p>
+            <p class="pl-11 mt-1.5 text-xs text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
+                <i data-lucide="star" class="w-3.5 h-3.5"></i>
+                @item.Question.Points points
+            </p>
         </article>
     }
 </section>
