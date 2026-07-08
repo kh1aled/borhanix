@@ -109,12 +109,20 @@
                class="block rounded-md px-3 py-2 text-base font-medium text-primary transition-colors">
                 Home
             </a>
-            <a asp-controller="Courses" asp-action="Index"
-               class="block rounded-md px-3 py-2 text-base font-medium text-foreground transition-colors hover:text-primary">
+            <a asp-controller="Home"
+               asp-action="Courses"
+               class="block rounded-md px-3 py-2 text-base font-medium text-foreground transition-colors hover:text-primary
+                @(currentAction == "Courses"
+                  ? "text-primary bg-primary/10"
+                  : "text-foreground hover:text-primary hover:animate-scale-animation")">
                 Courses
             </a>
-            <a asp-controller="Instructors" asp-action="Index"
-               class="block rounded-md px-3 py-2 text-base font-medium text-foreground transition-colors hover:text-primary">
+            <a asp-controller="Home"
+               asp-action="Instructors"
+               class="block rounded-md px-3 py-2 text-base font-medium text-foreground transition-colors hover:text-primary
+                @(currentAction == "Instructors"
+                 ? "text-primary bg-primary/10"
+                 : "text-foreground hover:text-primary hover:animate-scale-animation")">
                 Instructors
             </a>
         </div>
