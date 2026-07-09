@@ -89,7 +89,7 @@ public class ProfileController(
 
         await userManager.UpdateAsync(user);
         await db.SaveChangesAsync();
-        TempData["Status"] = "Profile updated.";
+        TempData["ToastSuccess"] = "Profile updated.";
         return RedirectToAction(nameof(Index));
     }
 
@@ -186,7 +186,7 @@ public class ProfileController(
             return View("Edit", profileModel);
         }
 
-        TempData["Status"] = "Password updated successfully.";
+        TempData["ToastSuccess"] = "Password updated successfully.";
         return View("Edit", profileModel);
     }
 
@@ -228,7 +228,7 @@ public class ProfileController(
 
         await signInManager.SignOutAsync();
 
-        TempData["Status"] =
+        TempData["ToastSuccess"] =
             "Email updated successfully. Please login again.";
 
         return RedirectToAction("Login", "Account");

@@ -195,7 +195,7 @@ public class AttendanceController(
 
         if (DateTimeOffset.UtcNow > session.ClosesAt)
         {
-            TempData["Error"] = "This attendance session has ended.";
+            TempData["ToastError"] = "This attendance session has ended.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -206,7 +206,7 @@ public class AttendanceController(
 
         if (profile is null)
         {
-            TempData["Error"] = "QR payload was not recognized as a student ID.";
+            TempData["ToastError"] = "QR payload was not recognized as a student ID.";
             return RedirectToAction(nameof(Scanner), new { sessionId = model.SessionId });
         }
 
@@ -217,7 +217,7 @@ public class AttendanceController(
 
         if (!approved)
         {
-            TempData["Error"] = $"{profile.User.FullName} is not approved for this course.";
+            TempData["ToastError"] = $"{profile.User.FullName} is not approved for this course.";
             return RedirectToAction(nameof(Scanner), new { sessionId = model.SessionId });
         }
 
@@ -243,7 +243,7 @@ public class AttendanceController(
         }
 
         await db.SaveChangesAsync();
-        TempData["Status"] = $"{profile.User.FullName} marked present for {session.Title}.";
+        TempData["ToastSuccess"] = $"{profile.User.FullName} marked present for {session.Title}.";
         return RedirectToAction(nameof(Scanner), new { sessionId = model.SessionId });
     }
 

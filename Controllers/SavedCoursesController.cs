@@ -71,13 +71,13 @@ public class SavedCoursesController(ApplicationDbContext db, UserManager<Applica
             if (courseExists)
             {
                 db.SavedCourses.Add(new SavedCourse { CourseId = courseId, StudentId = userId });
-                TempData["Status"] = "Course saved.";
+                TempData["ToastSuccess"] = "Course saved.";
             }
         }
         else
         {
             db.SavedCourses.Remove(existing);
-            TempData["Status"] = "Course removed from saved courses.";
+            TempData["ToastSuccess"] = "Course removed from saved courses.";
         }
 
         await db.SaveChangesAsync();

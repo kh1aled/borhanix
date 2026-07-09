@@ -110,7 +110,7 @@ public class AccountController(
         }
 
         await db.SaveChangesAsync();
-        TempData["Status"] = "Account created. Admin approval is required before login.";
+        TempData["ToastSuccess"] = "Account created. Admin approval is required before login.";
         return RedirectToAction(nameof(Login));
     }
 

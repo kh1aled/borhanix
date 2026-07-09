@@ -51,7 +51,7 @@ public class AdminController(ApplicationDbContext db, UserManager<ApplicationUse
     {
         if (!ModelState.IsValid)
         {
-            TempData["Error"] = "User update failed validation.";
+            TempData["ToastError"] = "User update failed validation.";
             return RedirectToAction(nameof(Users));
         }
 
@@ -84,7 +84,7 @@ public class AdminController(ApplicationDbContext db, UserManager<ApplicationUse
             await userManager.AddToRoleAsync(user, model.Role);
         }
 
-        TempData["Status"] = "User updated.";
+        TempData["ToastSuccess"] = "User updated.";
         return RedirectToAction(nameof(Users));
     }
 
@@ -99,7 +99,7 @@ public class AdminController(ApplicationDbContext db, UserManager<ApplicationUse
 
         user.IsApproved = true;
         await userManager.UpdateAsync(user);
-        TempData["Status"] = $"{user.FullName} approved.";
+        TempData["ToastSuccess"] = $"{user.FullName} approved.";
         return RedirectToAction(nameof(Users));
     }
 
@@ -109,7 +109,7 @@ public class AdminController(ApplicationDbContext db, UserManager<ApplicationUse
         var currentAdminId = userManager.GetUserId(User);
         if (id == currentAdminId)
         {
-            TempData["Error"] = "You cannot delete your own admin account while signed in.";
+            TempData["ToastError"] = "You cannot delete your own admin account while signed in.";
             return RedirectToAction(nameof(Users));
         }
 
@@ -136,7 +136,7 @@ public class AdminController(ApplicationDbContext db, UserManager<ApplicationUse
 
         await db.SaveChangesAsync();
         var result = await userManager.DeleteAsync(user);
-        TempData[result.Succeeded ? "Status" : "Error"] = result.Succeeded
+        TempData[result.Succeeded ? "ToastSuccess" : "ToastError"] = result.Succeeded
             ? "User deleted."
             : string.Join("; ", result.Errors.Select(x => x.Description));
 

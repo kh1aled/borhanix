@@ -34,7 +34,7 @@ public class CertificatesController(
 
         if (!await completionService.IsEligibleForCertificateAsync(courseId, userId))
         {
-            TempData["Error"] = "Complete all lessons and pass every quiz before generating your certificate.";
+            TempData["ToastError"] = "Complete all lessons and pass every quiz before generating your certificate.";
             return RedirectToAction("Details", "Courses", new { id = courseId });
         }
 

@@ -55,7 +55,7 @@ public class EnrollmentsController(ApplicationDbContext db, UserManager<Applicat
         enrollment.InstructorNote = note;
         await db.SaveChangesAsync();
 
-        TempData["Status"] = $"Enrollment {status.ToString().ToLowerInvariant()}.";
+        TempData["ToastSuccess"] = $"Enrollment {status.ToString().ToLowerInvariant()}.";
         return RedirectToAction(nameof(Pending));
     }
 }

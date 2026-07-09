@@ -298,7 +298,7 @@ public class CoursesController(
                 Status = EnrollmentStatus.Pending
             });
             await db.SaveChangesAsync();
-            TempData["Status"] = "Enrollment request sent. An instructor or admin must approve it.";
+            TempData["ToastSuccess"] = "Enrollment request sent. An instructor or admin must approve it.";
         }
 
         return RedirectToAction(nameof(Details), new { id });

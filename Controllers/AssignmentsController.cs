@@ -100,7 +100,7 @@ public class AssignmentsController(
 
         if (existingSubmission is not null)
         {
-            TempData["Error"] = "You have already submitted this assignment. Re-submission is not allowed.";
+            TempData["ToastError"] = "You have already submitted this assignment. Re-submission is not allowed.";
             return RedirectToAction(nameof(Details), new { id = model.AssignmentId });
         }
 
@@ -111,20 +111,20 @@ public class AssignmentsController(
         {
             access.Status = AssignmentStudentStatus.Missing;
             await db.SaveChangesAsync();
-            TempData["Error"] = "Your personal deadline has expired. This assignment is now marked as Missing.";
+            TempData["ToastError"] = "Your personal deadline has expired. This assignment is now marked as Missing.";
             return RedirectToAction(nameof(Details), new { id = model.AssignmentId });
         }
 
         var fileUrl = await SaveSubmissionFileAsync(model.SubmissionFile);
         if (!ModelState.IsValid)
         {
-            TempData["Error"] = "Submission file must be PDF, ZIP, DOCX, PNG, JPG, or a plain URL.";
+            TempData["ToastError"] = "Submission file must be PDF, ZIP, DOCX, PNG, JPG, or a plain URL.";
             return RedirectToAction(nameof(Details), new { id = model.AssignmentId });
         }
 
         if (string.IsNullOrWhiteSpace(fileUrl) && string.IsNullOrWhiteSpace(model.FileUrl))
         {
-            TempData["Error"] = "Upload a file or provide a file URL before submitting.";
+            TempData["ToastError"] = "Upload a file or provide a file URL before submitting.";
             return RedirectToAction(nameof(Details), new { id = model.AssignmentId });
         }
 
@@ -138,7 +138,7 @@ public class AssignmentsController(
 
         access.Status = AssignmentStudentStatus.Submitted;
         await db.SaveChangesAsync();
-        TempData["Status"] = "Assignment submitted successfully.";
+        TempData["ToastSuccess"] = "Assignment submitted successfully.";
         return RedirectToAction(nameof(Details), new { id = model.AssignmentId });
     }
 
@@ -190,7 +190,7 @@ public class AssignmentsController(
         }
 
         await db.SaveChangesAsync();
-        TempData["Status"] = "Submission graded.";
+        TempData["ToastSuccess"] = "Submission graded.";
         return RedirectToAction(nameof(Details), new { id = submission.AssignmentId });
     }
 

@@ -35,7 +35,7 @@ public class CartController(ApplicationDbContext db, UserManager<ApplicationUser
         {
             db.CartItems.Add(new CartItem { CourseId = courseId, StudentId = userId });
             await db.SaveChangesAsync();
-            TempData["Status"] = "Course added to your cart.";
+            TempData["ToastSuccess"] = "Course added to your cart.";
         }
 
         return RedirectBack(returnUrl);
@@ -141,7 +141,7 @@ public class CartController(ApplicationDbContext db, UserManager<ApplicationUser
         await db.CartItems.Where(x => x.StudentId == userId).ExecuteDeleteAsync();
         await db.SaveChangesAsync();
 
-        TempData["Status"] = "Sandbox payment succeeded. Your courses are ready.";
+        TempData["ToastSuccess"] = "Sandbox payment succeeded. Your courses are ready.";
         return RedirectToAction(nameof(Success));
     }
 

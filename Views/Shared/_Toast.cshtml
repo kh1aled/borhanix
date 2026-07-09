@@ -1,0 +1,42 @@
+﻿@{
+    var toasts = new (string type, string message)[]
+    {
+        ("success", TempData["ToastSuccess"] as string),
+        ("error", TempData["ToastError"] as string),
+        ("warning", TempData["ToastWarning"] as string),
+        ("info", TempData["ToastInfo"] as string),
+    };
+}
+
+<div id="toast-container" class="fixed top-4 right-4 z-[9999] flex flex-col gap-3 w-full max-w-sm">
+    @foreach (var (type, message) in toasts)
+    {
+        if (!string.IsNullOrEmpty(message))
+        {
+            <div class="toast-item flex items-start gap-3 rounded-2xl px-4 py-3 shadow-lg border
+                bg-white dark:bg-slate-900 dark:border-slate-800
+                @(type == "success" ? "border-emerald-200" :
+                   type == "error" ? "border-red-200" :
+                   type == "warning" ? "border-amber-200" : "border-blue-200")"
+                 data-toast data-type="@type">
+
+                <span class="mt-0.5 shrink-0
+                    @(type == "success" ? "text-emerald-500" :
+                        type == "error" ? "text-red-500" :
+                        type == "warning" ? "text-amber-500" : "text-primary")">
+                    <i data-lucide="@(type == "success" ? "check-circle" :
+                                                              type == "error" ? "x-circle" :
+                                                              type == "warning" ? "alert-triangle" : "info")"
+                       class="w-5 h-5"></i>
+                </span>
+
+                <p class="text-sm text-slate-700 dark:text-slate-200 flex-1">@message</p>
+
+                <button type="button" onclick="this.closest('[data-toast]').remove()"
+                        class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+        }
+    }
+</div>

@@ -75,7 +75,7 @@ public class InstructorStudioController(
 
         course.IsPublished = !course.IsPublished;
         await db.SaveChangesAsync();
-        TempData["Status"] = course.IsPublished ? "Course published." : "Course unpublished.";
+        TempData["ToastSuccess"] = course.IsPublished ? "Course published." : "Course unpublished.";
         return RedirectToAction(nameof(Index));
     }
 
@@ -122,6 +122,7 @@ public class InstructorStudioController(
             CreatedById = userId
         });
         await db.SaveChangesAsync();
+        TempData["ToastSuccess"] = "Course created successfully.";
         return RedirectToAction(nameof(Index));
     }
 
@@ -211,7 +212,7 @@ public class InstructorStudioController(
         course.IsPublished = model.IsPublished;
 
         await db.SaveChangesAsync();
-        TempData["Status"] = "Course updated.";
+        TempData["ToastSuccess"] = "Course updated successfuly.";
         return RedirectToAction(nameof(Index));
     }
 
@@ -226,7 +227,7 @@ public class InstructorStudioController(
 
         db.Courses.Remove(course);
         await db.SaveChangesAsync();
-        TempData["Status"] = "Course removed.";
+        TempData["ToastSuccess"] = "Course removed.";
         return RedirectToAction(nameof(Index));
     }
 
@@ -250,7 +251,7 @@ public class InstructorStudioController(
             });
             await db.SaveChangesAsync();
         }
-
+        TempData["ToastSuccess"] = "Module added.";
         return RedirectToAction(nameof(ManageContent) , new { id = model.CourseId});
     }
 
@@ -273,7 +274,7 @@ public class InstructorStudioController(
             var videoUrl = await SaveLessonVideoAsync(model.VideoFile);
             if (!ModelState.IsValid)
             {
-                TempData["Error"] = "Lesson video must be MP4, WEBM, MOV, or M4V.";
+                TempData["ToastError"] = "Lesson video must be MP4, WEBM, MOV, or M4V.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -303,6 +304,7 @@ public class InstructorStudioController(
 
             db.Lessons.Add(newLesson);
             await db.SaveChangesAsync();
+            TempData["ToastSuccess"] = "Lesson added.";
             return RedirectToAction(nameof(ManageContent), new { id = module.CourseId, lessonId = newLesson.Id });
 
         }
@@ -356,7 +358,7 @@ public class InstructorStudioController(
         module.Title = model.Title;
         module.Summary = model.Summary;
         await db.SaveChangesAsync();
-        TempData["Status"] = "Module updated.";
+        TempData["ToastSuccess"] = "Module updated.";
         return RedirectToAction(nameof(ManageContent), new { id = module.CourseId });
     }
 
@@ -385,7 +387,7 @@ public class InstructorStudioController(
 
         db.CourseModules.Remove(module);
         await db.SaveChangesAsync();
-        TempData["Status"] = "Module removed.";
+        TempData["ToastSuccess"] = "Module removed.";
         return RedirectToAction(nameof(ManageContent), new { id = module.CourseId });
     }
 
@@ -447,7 +449,7 @@ public class InstructorStudioController(
         var videoUrl = await SaveLessonVideoAsync(model.VideoFile);
         if (!ModelState.IsValid)
         {
-            TempData["Error"] = "Lesson video must be MP4, WEBM, MOV, or M4V.";
+            TempData["ToastError"] = "Lesson video must be MP4, WEBM, MOV, or M4V.";
             return View(model);
         }
 
@@ -470,7 +472,7 @@ public class InstructorStudioController(
         lesson.DurationMinutes = model.DurationMinutes;
 
         await db.SaveChangesAsync();
-        TempData["Status"] = "Lesson updated.";
+        TempData["ToastSuccess"] = "Lesson updated.";
         return RedirectToAction(nameof(Index));
     }
 
@@ -495,7 +497,7 @@ public class InstructorStudioController(
         await RemoveLessonQuizzesAsync(lesson.Id);
         db.Lessons.Remove(lesson);
         await db.SaveChangesAsync();
-        TempData["Status"] = "Lesson removed.";
+        TempData["ToastSuccess"] = "Lesson removed.";
         return RedirectToAction(nameof(Index));
     }
 
@@ -541,7 +543,7 @@ public class InstructorStudioController(
 
         db.Quizzes.Add(quiz);
         await db.SaveChangesAsync(cancellationToken);
-        TempData["Status"] = "AI quiz generated for the lesson.";
+        TempData["ToastSuccess"] = "AI quiz generated for the lesson.";
         return RedirectToAction(nameof(Index));
     }
 
