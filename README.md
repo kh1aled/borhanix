@@ -1,6 +1,8 @@
 # Borhanix - e-learning platform
 
-**Borhanix** is a modern e-learning platform designed to help learners build real-world skills through high-quality, practical courses.
+**Borhanix** is a white-label LMS framework that enables teachers, educational centers, academies, schools, and training businesses to launch fully branded online learning platforms under their own identity.
+
+Unlike traditional SaaS LMS platforms, each client receives an independent deployable platform instance with full customization and hosting control..
 
 ---
 
@@ -11,13 +13,17 @@ Borhanix aims to make learning simple, accessible, and effective by providing:
 - High-quality video courses
 - Real-world projects
 - Skill-based education
-
+Clients can:
+- Use their own branding
+- Connect custom domains
+- Deploy on their own hosting infrastructure
+- Customize platform appearance
+- Manage their own students and content
+- Operate independently from other clients
 ---
 
 ## 🎯 Mission
-
-To empower individuals to grow their skills and achieve their goals through practical and accessible education.
-
+provides a reusable LMS infrastructure that allows businesses to launch their own educational ecosystem without building a platform from scratch.
 ---
 
 ## 👁 Vision
@@ -49,11 +55,7 @@ To become a leading global platform for skill-based learning and professional de
 - HTML5
 - CSS3 / Sass
 - JavaScript
-- Bootstrap
+- Taildwindcss
 
 ### Database
 - SQL Server
-
----
-
-## 📂 Project Structure
